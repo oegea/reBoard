@@ -50,9 +50,9 @@ TEST(GestureDetectorTest, FiresSwipeOnlyOncePerTouch) {
     EXPECT_FALSE(detector.feed(up(0.5, 0.40, 300)));
 }
 
-TEST(GestureDetectorTest, DetectsLongPressThroughPolling) {
+TEST(GestureDetectorTest, DetectsLongPressAtTheBottomEdge) {
     GestureDetector detector;
-    detector.feed(down(0.5, 0.5, 1000));
+    detector.feed(down(0.5, 0.95, 1000));
     EXPECT_FALSE(detector.poll(2000));
     const auto gesture = detector.poll(2600);
     ASSERT_TRUE(gesture);
@@ -61,17 +61,23 @@ TEST(GestureDetectorTest, DetectsLongPressThroughPolling) {
     EXPECT_FALSE(detector.poll(5000));
 }
 
-TEST(GestureDetectorTest, MovementCancelsLongPress) {
+TEST(GestureDetectorTest, IgnoresLongPressOutsideTheBottomEdge) {
     GestureDetector detector;
     detector.feed(down(0.5, 0.5, 0));
-    detector.feed(move(0.6, 0.6, 100));
+    EXPECT_FALSE(detector.poll(5000));
+}
+
+TEST(GestureDetectorTest, MovementCancelsLongPress) {
+    GestureDetector detector;
+    detector.feed(down(0.5, 0.95, 0));
+    detector.feed(move(0.6, 0.9, 100));
     EXPECT_FALSE(detector.poll(3000));
 }
 
 TEST(GestureDetectorTest, ReleaseCancelsLongPress) {
     GestureDetector detector;
-    detector.feed(down(0.5, 0.5, 0));
-    detector.feed(up(0.5, 0.5, 100));
+    detector.feed(down(0.5, 0.95, 0));
+    detector.feed(up(0.5, 0.95, 100));
     EXPECT_FALSE(detector.poll(3000));
 }
 
@@ -84,6 +90,6 @@ TEST(GestureDetectorTest, HonorsCustomConfiguration) {
     GestureDetectorConfig config;
     config.longPressDurationMs = 100;
     GestureDetector detector(config);
-    detector.feed(down(0.5, 0.5, 0));
+    detector.feed(down(0.5, 0.95, 0));
     EXPECT_TRUE(detector.poll(150));
 }

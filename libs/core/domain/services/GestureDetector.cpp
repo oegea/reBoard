@@ -65,6 +65,11 @@ std::optional<Gesture> GestureDetector::checkSwipeUp(double y, std::uint64_t tim
 }
 
 std::optional<Gesture> GestureDetector::checkLongPress(std::uint64_t nowMs) {
+    // Both home gestures live at the bottom edge: a long press anywhere
+    // else must never yank the user out of the running application.
+    if (!startedAtBottomEdge_) {
+        return std::nullopt;
+    }
     if (maxMovement_ > config_.longPressMaxMovement) {
         return std::nullopt;
     }
