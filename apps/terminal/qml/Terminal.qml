@@ -141,7 +141,9 @@ Window {
 
             readonly property real cellWidth: cellMetrics.advanceWidth / 50
             readonly property real cellHeight: Math.ceil(cellMetrics.height)
-            readonly property int gridColumns: Math.max(20, Math.floor(width / cellWidth))
+            // One column of safety margin: if the metric slightly
+            // underestimates the advance, the last column would clip.
+            readonly property int gridColumns: Math.max(20, Math.floor(width / cellWidth) - 1)
             readonly property int gridRows: Math.max(5, Math.floor(height / cellHeight))
 
             onGridColumnsChanged: terminalVm.setGridSize(gridColumns, gridRows)
@@ -162,16 +164,8 @@ Window {
                 }
             }
 
-            // Block cursor.
-            Rectangle {
-                visible: terminalVm.cursorVisible && terminalVm.shellRunning
-                x: terminalVm.cursorColumn * screenArea.cellWidth
-                y: terminalVm.cursorRow * screenArea.cellHeight
-                width: screenArea.cellWidth
-                height: screenArea.cellHeight
-                color: "black"
-                opacity: 0.45
-            }
+            // (The block cursor is rendered inside the text itself as an
+            // inverted cell — see TerminalViewModel — so it can never drift.)
 
             // System convention (ADR-0005): tapping a typing surface
             // summons the on-screen keyboard, unless a physical keyboard is
@@ -185,6 +179,15 @@ Window {
                     }
                 }
             }
+        }
+
+        // Gesture-zone hint, standard on every screen (the home gesture
+        // works over the keyboard area too).
+        HomeMarker {
+            z: 10
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 8
+            anchors.horizontalCenter: parent.horizontalCenter
         }
 
         OnScreenKeyboard {

@@ -39,3 +39,11 @@ applications on my tablet without touching a terminal.
 - [ ] Long-press uninstall works exactly and only for store apps.
 - [ ] Repository URL change lives in Settings behind a warning.
 - [ ] Works offline gracefully (clear error states, retry).
+
+## Pending (detected in device testing, 2026-07-26)
+
+- **Updates**: the store only knows install/remove. It must record the
+  installed version, compare it against the catalog and offer an "Update"
+  action. Until then, updating an app means remove + install.
+- Repository URL editing stays blocked on the keyboard system (story 010
+  phase 2: reKit TextField).

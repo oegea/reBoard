@@ -136,11 +136,23 @@ void TerminalViewModel::refreshLines() {
     QStringList rendered;
     rendered.reserve(emulator_.rows());
 
+    // The cursor is rendered as an inverted cell INSIDE the text: the same
+    // engine that lays out the glyphs positions it, so it can never drift
+    // from the real typing position (font metrics proved unreliable).
+    const bool paintCursor = emulator_.cursorVisible() && pty_.running();
+
+    int rowIndex = 0;
     for (const auto& row : emulator_.screen()) {
+        const bool cursorHere = paintCursor && rowIndex == emulator_.cursorRow();
         QString html;
         bool bold = false;
         bool inverse = false;
-        for (const Cell& cell : row) {
+        int columnIndex = 0;
+        for (Cell cell : row) {
+            if (cursorHere && columnIndex == emulator_.cursorColumn()) {
+                cell.inverse = !cell.inverse;
+            }
+            ++columnIndex;
             if (cell.bold != bold) {
                 html += cell.bold ? QLatin1String("<b>") : QLatin1String("</b>");
                 bold = cell.bold;
@@ -161,6 +173,7 @@ void TerminalViewModel::refreshLines() {
             html += QLatin1String("</b>");
         }
         rendered.append(html);
+        ++rowIndex;
     }
 
     lines_ = rendered;
