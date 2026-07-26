@@ -56,8 +56,29 @@ void PosixProcessRepository::stop(const domain::ProcessHandle& handle) {
     if (::kill(-handle.pid(), SIGTERM) != 0) {
         ::kill(handle.pid(), SIGTERM);
     }
-    // Opportunistic, non-blocking reap in case the group leader dies quickly.
-    ::waitpid(handle.pid(), nullptr, WNOHANG);
+    if (waitForExit(handle.pid(), 2000)) {
+        return;
+    }
+    // The application ignored SIGTERM; the display must be freed, so kill it.
+    if (::kill(-handle.pid(), SIGKILL) != 0) {
+        ::kill(handle.pid(), SIGKILL);
+    }
+    waitForExit(handle.pid(), 1000);
+}
+
+bool PosixProcessRepository::waitForExit(int pid, int timeoutMs) {
+    const int pollIntervalMs = 20;
+    for (int elapsed = 0; elapsed <= timeoutMs; elapsed += pollIntervalMs) {
+        const pid_t waited = ::waitpid(pid, nullptr, WNOHANG);
+        if (waited == pid) {
+            return true;  // Reaped: it is gone.
+        }
+        if (waited < 0 && ::kill(pid, 0) != 0) {
+            return true;  // Not our child and no longer alive.
+        }
+        ::usleep(pollIntervalMs * 1000);
+    }
+    return false;
 }
 
 bool PosixProcessRepository::isRunning(const domain::ProcessHandle& handle) const {

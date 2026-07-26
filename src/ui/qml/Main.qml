@@ -9,22 +9,14 @@ Window {
     color: "white"
     title: "reBoard"
 
-    Connections {
-        target: launcher
-        function onRequestShowLauncher() {
-            board.reload()
-            root.visible = true
-            root.requestActivate()
-        }
-        function onRequestHideLauncher() {
-            root.visible = false
-        }
-    }
-
     // One selectable application icon, shared by the grid and the dock.
+    // Note: appData must NOT be a required property. Delegates with required
+    // properties opt out of the legacy context injection, so `modelData`
+    // would no longer be resolvable when AppIcon is used as a delegate.
     component AppIcon: Item {
         id: iconRoot
-        required property var appData
+        property var appData: null
+        readonly property bool hasIcon: appData !== null && appData.icon !== ""
         width: 200
         height: 240
 
@@ -41,15 +33,15 @@ Window {
             Image {
                 anchors.fill: parent
                 anchors.margins: 8
-                source: iconRoot.appData.icon !== "" ? "file://" + iconRoot.appData.icon : ""
-                visible: iconRoot.appData.icon !== ""
+                source: iconRoot.hasIcon ? "file://" + iconRoot.appData.icon : ""
+                visible: iconRoot.hasIcon
                 fillMode: Image.PreserveAspectFit
             }
 
             Text {
                 anchors.centerIn: parent
-                visible: iconRoot.appData.icon === ""
-                text: iconRoot.appData.initial
+                visible: !iconRoot.hasIcon
+                text: iconRoot.appData !== null ? iconRoot.appData.initial : ""
                 font.pixelSize: 64
                 font.bold: true
                 color: "black"
@@ -61,7 +53,7 @@ Window {
             anchors.topMargin: 12
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width - 12
-            text: iconRoot.appData.name
+            text: iconRoot.appData !== null ? iconRoot.appData.name : ""
             font.pixelSize: 28
             color: "black"
             horizontalAlignment: Text.AlignHCenter
@@ -70,7 +62,11 @@ Window {
 
         MouseArea {
             anchors.fill: parent
-            onClicked: launcher.launch(iconRoot.appData.appId)
+            onClicked: {
+                if (iconRoot.appData !== null) {
+                    launcher.launch(iconRoot.appData.appId)
+                }
+            }
         }
     }
 

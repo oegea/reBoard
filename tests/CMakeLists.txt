@@ -14,6 +14,7 @@ add_executable(reboard_tests
     application/UseCasesTest.cpp
     infrastructure/ManifestParserTest.cpp
     infrastructure/PosixProcessRepositoryTest.cpp
+    infrastructure/UiDirectiveTest.cpp
     infrastructure/RepositoriesTest.cpp
 )
 target_link_libraries(reboard_tests PRIVATE reboard_core GTest::gtest_main)

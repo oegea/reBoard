@@ -15,7 +15,11 @@ public:
     // std::runtime_error when the target cannot be started.
     virtual ProcessHandle launch(const LaunchTarget& target) = 0;
 
-    // Politely stops whatever the handle points at.
+    // Stops whatever the handle points at and does not return until it has
+    // actually terminated (escalating if needed). This guarantee matters on
+    // e-paper devices: the display can only be owned by one process at a
+    // time, so the next application must never start while the previous one
+    // is still alive.
     virtual void stop(const ProcessHandle& handle) = 0;
 
     virtual bool isRunning(const ProcessHandle& handle) const = 0;

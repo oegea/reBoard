@@ -2,37 +2,20 @@
 
 #include <QObject>
 #include <QString>
-#include <QTimer>
-
-#include "application/UseCaseFactory.h"
 
 namespace reboard::ui {
 
-// Orchestrates the launcher lifecycle from the UI: launching applications,
-// reacting to the home gesture, and noticing when the foreground application
-// exits on its own.
+// The UI is a short-lived process: choosing an application prints a
+// directive to stdout and quits. The resident daemon (which spawned us)
+// launches the application once this process is dead and the e-paper
+// display is free.
 class LauncherController : public QObject {
     Q_OBJECT
 
 public:
-    explicit LauncherController(application::UseCaseFactory& useCases, QObject* parent = nullptr);
+    explicit LauncherController(QObject* parent = nullptr);
 
     Q_INVOKABLE void launch(const QString& applicationId);
-
-public slots:
-    void onHomeGestureDetected();
-
-signals:
-    // The QML window reacts to these: the launcher hides while a third-party
-    // application owns the e-paper display and shows itself again on "home".
-    void requestShowLauncher();
-    void requestHideLauncher();
-
-private:
-    void refreshForegroundState();
-
-    application::UseCaseFactory& useCases_;
-    QTimer foregroundPollTimer_;
 };
 
 }  // namespace reboard::ui

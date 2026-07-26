@@ -60,8 +60,8 @@ cross-rm1 cross-rm2 cross-ferrari: cross-%: sdk-% ## Cross-compile the full laun
 		$(CMAKE) --build $(BUILD_DIR)-$* -j $(JOBS)'
 	@echo "Binary ready at $(BUILD_DIR)-$*/src/reboard"
 
-deploy: ## Copy the reMarkable 2 binary and packaging files to the device (RM_HOST=root@10.11.99.1)
-	scp $(BUILD_DIR)-rm2/src/reboard $(RM_HOST):/home/root/reboard
+deploy: ## Copy the reMarkable 2 binaries and packaging files to the device (RM_HOST=root@10.11.99.1)
+	scp $(BUILD_DIR)-rm2/src/reboard $(BUILD_DIR)-rm2/src/reboard-ui $(RM_HOST):/home/root/
 	scp packaging/reboard.service $(RM_HOST):/etc/systemd/system/reboard.service
 	@echo "Deployed. On the device: systemctl daemon-reload && systemctl start reboard"
 

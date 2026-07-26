@@ -17,11 +17,16 @@ public:
     explicit PosixProcessRepository(std::string systemctlPath = "systemctl");
 
     domain::ProcessHandle launch(const domain::LaunchTarget& target) override;
+
+    // Blocks until the target is dead: SIGTERM, then SIGKILL after a grace
+    // period. `systemctl stop` is synchronous by itself.
     void stop(const domain::ProcessHandle& handle) override;
+
     bool isRunning(const domain::ProcessHandle& handle) const override;
 
 private:
     int runSystemctl(const std::string& verb, const std::string& unitName) const;
+    static bool waitForExit(int pid, int timeoutMs);
 
     std::string systemctlPath_;
 };

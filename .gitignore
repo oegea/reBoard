@@ -3,8 +3,9 @@ build/
 build-*/
 cmake-build-*/
 
-# reMarkable SDK installations
+# reMarkable SDK installations and cached installers
 sdk/
+.sdk-cache/
 *.sh.downloaded
 
 # IDE / tooling

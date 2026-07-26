@@ -10,9 +10,11 @@ Type=simple
 # Take over the e-paper display from the stock UI before starting. reBoard
 # starts xochitl again when the user opens the "Notebooks" entry.
 ExecStartPre=-/bin/systemctl stop xochitl
+# The daemon inherits these to the short-lived reboard-ui process it spawns.
+Environment=QT_QPA_PLATFORM=epaper
 Environment=QT_QUICK_BACKEND=epaper
 Environment=QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=rotate=180:invertx
-ExecStart=/home/root/reboard -platform epaper
+ExecStart=/home/root/reboard
 Restart=on-failure
 RestartSec=2
 
