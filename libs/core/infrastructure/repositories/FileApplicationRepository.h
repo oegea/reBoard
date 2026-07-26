@@ -14,12 +14,19 @@ namespace reboard::infrastructure {
 // whole board down.
 class FileApplicationRepository : public domain::ApplicationRepository {
 public:
-    explicit FileApplicationRepository(std::vector<std::string> manifestDirectories);
+    // Applications from `removableManifestDirectories` (the store-managed
+    // location, ADR-0006) are flagged removable; the rest never are.
+    explicit FileApplicationRepository(std::vector<std::string> manifestDirectories,
+                                       std::vector<std::string> removableManifestDirectories = {});
 
     std::vector<domain::Application> findAll() const override;
 
 private:
+    void loadDirectory(const std::string& directory, bool removable,
+                       std::vector<domain::Application>& applications) const;
+
     std::vector<std::string> manifestDirectories_;
+    std::vector<std::string> removableManifestDirectories_;
     ManifestParser parser_;
 };
 

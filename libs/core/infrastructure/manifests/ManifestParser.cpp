@@ -26,7 +26,8 @@ void setError(std::string* error, const std::string& message) {
 
 std::optional<domain::Application> ManifestParser::parse(const std::string& id,
                                                          const std::string& content,
-                                                         std::string* error) const {
+                                                         std::string* error,
+                                                         bool removable) const {
     std::map<std::string, std::string> values;
     std::istringstream stream(content);
     std::string line;
@@ -99,11 +100,12 @@ std::optional<domain::Application> ManifestParser::parse(const std::string& id,
                 return std::nullopt;
             }
             return domain::Application(domain::ApplicationId(id), domain::ApplicationName(name->second),
-                                       domain::LaunchTarget::process(*argv), iconPath, dock, hint);
+                                       domain::LaunchTarget::process(*argv), iconPath, dock, hint,
+                                       removable);
         }
         return domain::Application(domain::ApplicationId(id), domain::ApplicationName(name->second),
                                    domain::LaunchTarget::systemdUnit(values.at("unit")), iconPath,
-                                   dock, hint);
+                                   dock, hint, removable);
     } catch (const std::exception& exception) {
         setError(error, exception.what());
         return std::nullopt;

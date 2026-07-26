@@ -37,7 +37,11 @@ SettingsViewModel::SettingsViewModel(QObject* parent) : QObject(parent) {
     if (!home.isEmpty()) {
         directories.push_back(home.toStdString() + "/.config/reboard/apps");
     }
-    infrastructure::FileApplicationRepository files(directories);
+    std::vector<std::string> removableDirectories;
+    if (!home.isEmpty()) {
+        removableDirectories.push_back(home.toStdString() + "/.config/reboard/apps-store");
+    }
+    infrastructure::FileApplicationRepository files(directories, removableDirectories);
     infrastructure::BuiltInApplicationRepository builtIns;
     infrastructure::CompositeApplicationRepository applications({&files, &builtIns});
     for (const auto& application : applications.findAll()) {

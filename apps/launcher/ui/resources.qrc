@@ -6,5 +6,6 @@
     <qresource prefix="/icons">
         <file alias="notebooks.png">icons/notebooks.png</file>
         <file alias="settings.png">icons/settings.png</file>
+        <file alias="store.png">icons/store.png</file>
     </qresource>
 </RCC>

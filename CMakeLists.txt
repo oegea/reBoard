@@ -34,11 +34,12 @@ add_subdirectory(apps/launcher)
 
 if(REBOARD_BUILD_UI)
     add_subdirectory(apps/settings)
+    add_subdirectory(apps/store)
 
     # Translation catalogs (ADR-0004), embedded under :/i18n in every app.
     find_package(Qt6 QUIET COMPONENTS LinguistTools)
     if(TARGET Qt6::lrelease)
-        qt6_add_translations(reboard-ui reboard-settings
+        qt6_add_translations(reboard-ui reboard-settings reboard-store
             TS_FILES libs/rekit/i18n/reboard_es.ts)
     else()
         message(WARNING "Qt LinguistTools not found: building without translations")

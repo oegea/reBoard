@@ -22,9 +22,11 @@ namespace reboard::infrastructure {
 class ManifestParser {
 public:
     // `id` usually comes from the manifest file name (without extension).
+    // `removable` marks store-managed applications (ADR-0006).
     // Returns std::nullopt and fills `error` when the manifest is invalid.
     std::optional<domain::Application> parse(const std::string& id, const std::string& content,
-                                             std::string* error = nullptr) const;
+                                             std::string* error = nullptr,
+                                             bool removable = false) const;
 
     // Splits a command line honoring double quotes. Exposed for testing.
     static std::optional<std::vector<std::string>> tokenizeCommandLine(const std::string& commandLine);

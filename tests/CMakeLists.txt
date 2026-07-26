@@ -14,6 +14,7 @@ add_executable(reboard_tests
     domain/OrientationTest.cpp
     application/UseCasesTest.cpp
     infrastructure/ManifestParserTest.cpp
+    infrastructure/PackagesTest.cpp
     infrastructure/PosixProcessRepositoryTest.cpp
     infrastructure/UiDirectiveTest.cpp
     infrastructure/RepositoriesTest.cpp

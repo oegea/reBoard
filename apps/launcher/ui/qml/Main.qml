@@ -15,6 +15,9 @@ Window {
     Item {
         id: content
         readonly property bool rotated: uiRotation === 90 || uiRotation === 270
+        // iOS-style edit mode: long-pressing a store app shows removal
+        // badges on every removable icon; tapping elsewhere leaves it.
+        property bool editMode: false
         width: rotated ? root.height : root.width
         height: rotated ? root.width : root.height
         anchors.centerIn: parent
@@ -48,6 +51,11 @@ Window {
                 width: pager.width
                 height: pager.height
 
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: content.editMode = false
+                }
+
                 GridView {
                     anchors.fill: parent
                     interactive: false
@@ -61,9 +69,21 @@ Window {
                         AppIcon {
                             anchors.horizontalCenter: parent.horizontalCenter
                             appData: modelData
-                            onActivated: (app) => app.showReturnHint
-                                ? hintDialog.openFor(app)
-                                : launcher.launch(app.appId)
+                            showRemoveBadge: content.editMode && modelData.removable
+                            onActivated: (app) => {
+                                if (content.editMode) {
+                                    content.editMode = false
+                                    return
+                                }
+                                app.showReturnHint ? hintDialog.openFor(app)
+                                                   : launcher.launch(app.appId)
+                            }
+                            onLongPressed: (app) => {
+                                if (app.removable) {
+                                    content.editMode = true
+                                }
+                            }
+                            onRemoveRequested: (app) => removeDialog.openFor(app)
                         }
                     }
                 }
@@ -117,9 +137,21 @@ Window {
                     model: board.dock
                     AppIcon {
                         appData: modelData
-                        onActivated: (app) => app.showReturnHint
-                            ? hintDialog.openFor(app)
-                            : launcher.launch(app.appId)
+                        showRemoveBadge: content.editMode && modelData.removable
+                        onActivated: (app) => {
+                            if (content.editMode) {
+                                content.editMode = false
+                                return
+                            }
+                            app.showReturnHint ? hintDialog.openFor(app)
+                                               : launcher.launch(app.appId)
+                        }
+                        onLongPressed: (app) => {
+                            if (app.removable) {
+                                content.editMode = true
+                            }
+                        }
+                        onRemoveRequested: (app) => removeDialog.openFor(app)
                     }
                 }
             }
@@ -136,6 +168,22 @@ Window {
             id: hintDialog
             anchors.fill: parent
             onConfirmed: (app) => launcher.launch(app.appId)
+        }
+
+        // Store-app removal confirmation (story 009).
+        ConfirmDialog {
+            id: removeDialog
+            anchors.fill: parent
+            confirmLabel: qsTr("Remove")
+            message: payload !== null
+                ? qsTr("Remove \"%1\"? Its files will be deleted from the device.").arg(payload.name)
+                : ""
+            onConfirmed: (app) => {
+                content.editMode = false
+                if (launcher.uninstall(app.appId)) {
+                    board.reload()
+                }
+            }
         }
 
         // Lock screen (story 007, phase 1): power button while the board is

@@ -10,8 +10,13 @@ Item {
 
     property var appData: null
     readonly property bool hasIcon: appData !== null && appData.icon !== ""
+    // iOS-style edit mode: shows the removal badge (the screen decides when,
+    // and only ever for removable applications).
+    property bool showRemoveBadge: false
 
     signal activated(var app)
+    signal longPressed(var app)
+    signal removeRequested(var app)
 
     width: 200
     height: 240
@@ -65,6 +70,45 @@ Item {
             if (iconRoot.appData !== null) {
                 iconRoot.activated(iconRoot.appData)
             }
+        }
+        onPressAndHold: {
+            if (iconRoot.appData !== null) {
+                iconRoot.longPressed(iconRoot.appData)
+            }
+        }
+    }
+
+    // Removal badge (drawn X), on top of everything including the tap area.
+    Rectangle {
+        visible: iconRoot.showRemoveBadge
+        width: 56
+        height: 56
+        radius: 28
+        color: "black"
+        anchors.horizontalCenter: iconBox.left
+        anchors.verticalCenter: iconBox.top
+
+        Rectangle {
+            anchors.centerIn: parent
+            width: 28
+            height: 7
+            radius: 3
+            color: "white"
+            rotation: 45
+        }
+        Rectangle {
+            anchors.centerIn: parent
+            width: 28
+            height: 7
+            radius: 3
+            color: "white"
+            rotation: -45
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            anchors.margins: -14
+            onClicked: iconRoot.removeRequested(iconRoot.appData)
         }
     }
 }

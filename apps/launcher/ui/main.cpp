@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 
     reboard::application::UseCaseFactory useCases(manifestDirectories());
     reboard::ui::BoardViewModel board(useCases);
-    reboard::ui::LauncherController launcher;
+    reboard::ui::LauncherController launcher(useCases);
 
     // Content rotation (0, 90 or 270) decided by the daemon; see
     // docs/stories/001-orientation-detection.md.

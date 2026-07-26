@@ -17,6 +17,82 @@
     </message>
 </context>
 <context>
+    <name>ConfirmDialog</name>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <source>Confirm</source>
+        <translation>Confirmar</translation>
+    </message>
+</context>
+<context>
+    <name>Main</name>
+    <message>
+        <source>Remove</source>
+        <translation>Eliminar</translation>
+    </message>
+    <message>
+        <source>Remove &quot;%1&quot;? Its files will be deleted from the device.</source>
+        <translation>¿Eliminar «%1»? Sus archivos se borrarán del dispositivo.</translation>
+    </message>
+</context>
+<context>
+    <name>Store</name>
+    <message>
+        <source>App Store</source>
+        <translation>App Store</translation>
+    </message>
+    <message>
+        <source>Loading…</source>
+        <translation>Cargando…</translation>
+    </message>
+    <message>
+        <source>The catalog could not be loaded.</source>
+        <translation>No se pudo cargar el catálogo.</translation>
+    </message>
+    <message>
+        <source>Retry</source>
+        <translation>Reintentar</translation>
+    </message>
+    <message>
+        <source>No applications in the catalog yet.</source>
+        <translation>Aún no hay aplicaciones en el catálogo.</translation>
+    </message>
+    <message>
+        <source>Install</source>
+        <translation>Instalar</translation>
+    </message>
+    <message>
+        <source>Installing…</source>
+        <translation>Instalando…</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Eliminar</translation>
+    </message>
+    <message>
+        <source>Not available for this device</source>
+        <translation>No disponible para este dispositivo</translation>
+    </message>
+</context>
+<context>
+    <name>StoreViewModel</name>
+    <message>
+        <source>The catalog is not valid.</source>
+        <translation>El catálogo no es válido.</translation>
+    </message>
+    <message>
+        <source>The application record is not valid.</source>
+        <translation>La ficha de la aplicación no es válida.</translation>
+    </message>
+    <message>
+        <source>Cannot write the downloaded package.</source>
+        <translation>No se puede guardar el paquete descargado.</translation>
+    </message>
+</context>
+<context>
     <name>BackButton</name>
     <message>
         <source>Back</source>

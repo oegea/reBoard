@@ -21,7 +21,11 @@ public:
                 domain::Application(domain::ApplicationId("settings"),
                                     domain::ApplicationName("Settings"),
                                     domain::LaunchTarget::process({"/home/root/reboard-settings"}),
-                                    "qrc:/icons/settings.png", /*pinnedToDock=*/true)};
+                                    "qrc:/icons/settings.png", /*pinnedToDock=*/true),
+                domain::Application(domain::ApplicationId("store"),
+                                    domain::ApplicationName("App Store"),
+                                    domain::LaunchTarget::process({"/home/root/reboard-store"}),
+                                    "qrc:/icons/store.png", /*pinnedToDock=*/true)};
     }
 };
 

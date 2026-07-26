@@ -6,6 +6,8 @@ Item {
     id: row
 
     property string label: ""
+    // Optional second line under the label (smaller, dimmed).
+    property string sublabel: ""
     property string value: ""
     property bool checked: false
     property bool showDivider: true
@@ -13,18 +15,33 @@ Item {
     signal clicked()
 
     width: parent ? parent.width : 0
-    height: 88
+    height: sublabel !== "" ? 118 : 88
 
-    Text {
+    Column {
         anchors.left: parent.left
         anchors.leftMargin: 28
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: rightSide.left
         anchors.rightMargin: 16
-        font.pixelSize: 30
-        color: "black"
-        elide: Text.ElideRight
-        text: row.label
+        spacing: 6
+
+        Text {
+            width: parent.width
+            font.pixelSize: 30
+            color: "black"
+            elide: Text.ElideRight
+            text: row.label
+        }
+
+        Text {
+            visible: row.sublabel !== ""
+            width: parent.width
+            font.pixelSize: 24
+            color: "black"
+            opacity: 0.55
+            elide: Text.ElideRight
+            text: row.sublabel
+        }
     }
 
     Row {
