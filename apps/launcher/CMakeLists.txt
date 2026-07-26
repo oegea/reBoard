@@ -26,7 +26,7 @@ if(REBOARD_BUILD_UI)
     set_target_properties(reboard-ui PROPERTIES AUTOMOC ON)
     target_compile_options(reboard-ui PRIVATE -Wall -Wextra)
     target_compile_definitions(reboard-ui PRIVATE REBOARD_VERSION="${PROJECT_VERSION}")
-    target_link_libraries(reboard-ui PRIVATE reboard_core Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick)
+    target_link_libraries(reboard-ui PRIVATE reboard_core rekit_qt Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick)
 
     install(TARGETS reboard-ui RUNTIME DESTINATION bin)
 endif()

@@ -1,6 +1,7 @@
 #include "StoreViewModel.h"
 
 #include <QCoreApplication>
+#include <QDebug>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -8,6 +9,7 @@
 #include <QNetworkReply>
 #include <QSettings>
 #include <QStandardPaths>
+#include <QTimer>
 
 #include "infrastructure/system/DeviceSlug.h"
 
@@ -60,7 +62,15 @@ QString StoreViewModel::repositoryUrl() const {
 }
 
 void StoreViewModel::reload() {
+    catalogAttempt_ = 0;
+    fetchCatalog();
+}
+
+void StoreViewModel::fetchCatalog() {
+    static constexpr int kMaxAttempts = 3;
+    ++catalogAttempt_;
     loading_ = true;
+    retrying_ = catalogAttempt_ > 1;
     offline_ = false;
     errorMessage_.clear();
     emit stateChanged();
@@ -69,16 +79,32 @@ void StoreViewModel::reload() {
         network_.get(QNetworkRequest(QUrl(repositoryUrl() + "/catalog.json")));
     connect(reply, &QNetworkReply::finished, this, [this, reply] {
         reply->deleteLater();
-        loading_ = false;
-        sections_.clear();
-        catalogPaths_ = QVariantMap();
 
         if (reply->error() != QNetworkReply::NoError) {
+            qWarning() << "reboard-store: catalog fetch attempt" << catalogAttempt_
+                       << "failed:" << reply->error() << reply->errorString();
+            // The Wi-Fi radio sleeps aggressively on e-paper devices and the
+            // first request often just wakes it up: retry quietly before
+            // bothering the user.
+            if (isConnectivityError(reply->error()) && catalogAttempt_ < kMaxAttempts) {
+                QTimer::singleShot(catalogAttempt_ == 1 ? 2000 : 4000, this,
+                                   [this] { fetchCatalog(); });
+                return;
+            }
+            loading_ = false;
+            retrying_ = false;
+            sections_.clear();
+            catalogPaths_ = QVariantMap();
             offline_ = isConnectivityError(reply->error());
             errorMessage_ = reply->errorString();
             emit stateChanged();
             return;
         }
+
+        loading_ = false;
+        retrying_ = false;
+        sections_.clear();
+        catalogPaths_ = QVariantMap();
         const QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
         if (!document.isObject()) {
             errorMessage_ = tr("The catalog is not valid.");

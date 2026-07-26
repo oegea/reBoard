@@ -12,6 +12,7 @@
 #include "application/UseCaseFactory.h"
 #include "BoardViewModel.h"
 #include "LauncherController.h"
+#include "LocaleResolver.h"
 #include "PowerButtonMonitor.h"
 
 namespace {
@@ -35,20 +36,9 @@ int main(int argc, char* argv[]) {
     QGuiApplication::setApplicationName("reboard-ui");
     QGuiApplication::setApplicationVersion(REBOARD_VERSION);
 
-    // Translations (ADR-0004): env override > persisted choice > system.
+    // Translations (ADR-0004): shared policy, see rekit LocaleResolver.
     QTranslator translator;
-    QLocale locale = QLocale::system();
-    const QString localeOverride = qEnvironmentVariable("REBOARD_LOCALE");
-    if (!localeOverride.isEmpty()) {
-        locale = QLocale(localeOverride);
-    } else {
-        QSettings config(QSettings::IniFormat, QSettings::UserScope, "reboard", "reboard");
-        const QString language = config.value("language", "system").toString();
-        if (language != QStringLiteral("system") && !language.isEmpty()) {
-            locale = QLocale(language);
-        }
-    }
-    if (translator.load(locale, "reboard", "_", ":/i18n")) {
+    if (translator.load(reboard::rekit::resolveLocale(), "reboard", "_", ":/i18n")) {
         QGuiApplication::installTranslator(&translator);
     }
 

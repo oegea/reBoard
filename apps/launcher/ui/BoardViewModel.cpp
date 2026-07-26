@@ -1,5 +1,6 @@
 #include "BoardViewModel.h"
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QVariantMap>
 
@@ -7,10 +8,27 @@ namespace reboard::ui {
 
 namespace {
 
+// Built-in names live in the (translation-free) core; localize them at the
+// presentation layer, but only when the user has not overridden the entry.
+QString displayName(const domain::Application& application) {
+    const QString name = QString::fromStdString(application.name().value());
+    const std::string& id = application.id().value();
+    if (id == "xochitl" && name == QStringLiteral("Notebooks")) {
+        return QCoreApplication::translate("BuiltInApps", "Notebooks");
+    }
+    if (id == "settings" && name == QStringLiteral("Settings")) {
+        return QCoreApplication::translate("BuiltInApps", "Settings");
+    }
+    if (id == "store" && name == QStringLiteral("App Store")) {
+        return QCoreApplication::translate("BuiltInApps", "App Store");
+    }
+    return name;
+}
+
 QVariantMap toVariant(const domain::Application& application) {
     QVariantMap map;
     map.insert("appId", QString::fromStdString(application.id().value()));
-    map.insert("name", QString::fromStdString(application.name().value()));
+    map.insert("name", displayName(application));
     map.insert("icon", QString::fromStdString(application.iconPath()));
     map.insert("showReturnHint", application.showReturnHint());
     map.insert("removable", application.removable());

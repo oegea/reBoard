@@ -73,7 +73,7 @@ Window {
             anchors.centerIn: parent
             font.pixelSize: 34
             color: "black"
-            text: qsTr("Loading…")
+            text: storeVm.retrying ? qsTr("Waking up Wi-Fi…") : qsTr("Loading…")
         }
 
         // Offline: guide the user to Wi-Fi (managed from the stock UI) and

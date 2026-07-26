@@ -9,23 +9,11 @@
 #include <QSettings>
 #include <QTranslator>
 
+#include "LocaleResolver.h"
 #include "StoreViewModel.h"
 #include "application/UseCaseFactory.h"
 
 namespace {
-
-QLocale resolveLocale() {
-    const QString envOverride = qEnvironmentVariable("REBOARD_LOCALE");
-    if (!envOverride.isEmpty()) {
-        return QLocale(envOverride);
-    }
-    QSettings config(QSettings::IniFormat, QSettings::UserScope, "reboard", "reboard");
-    const QString language = config.value("language", "system").toString();
-    if (language != QStringLiteral("system") && !language.isEmpty()) {
-        return QLocale(language);
-    }
-    return QLocale::system();
-}
 
 std::vector<std::string> manifestDirectories() {
     std::vector<std::string> directories = {"/etc/reboard/apps", "/opt/etc/reboard/apps"};
@@ -44,7 +32,7 @@ int main(int argc, char* argv[]) {
     QGuiApplication::setApplicationVersion(REBOARD_VERSION);
 
     QTranslator translator;
-    if (translator.load(resolveLocale(), "reboard", "_", ":/i18n")) {
+    if (translator.load(reboard::rekit::resolveLocale(), "reboard", "_", ":/i18n")) {
         QGuiApplication::installTranslator(&translator);
     }
 

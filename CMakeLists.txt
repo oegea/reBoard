@@ -30,6 +30,9 @@ if(NOT REBOARD_GIT_HASH)
 endif()
 
 add_subdirectory(libs/core)
+if(REBOARD_BUILD_UI)
+    add_subdirectory(libs/rekit)
+endif()
 add_subdirectory(apps/launcher)
 
 if(REBOARD_BUILD_UI)
@@ -37,13 +40,29 @@ if(REBOARD_BUILD_UI)
     add_subdirectory(apps/store)
 
     # Translation catalogs (ADR-0004), embedded under :/i18n in every app.
+    # Done manually because qt_add_translations produced resource aliases
+    # like "../../reboard_es.qm" (unreachable at :/i18n/reboard_es.qm) and
+    # only attached the catalogs to the first target.
     find_package(Qt6 QUIET COMPONENTS LinguistTools)
-    if(TARGET Qt6::lrelease)
-        qt6_add_translations(reboard-ui reboard-settings reboard-store
-            TS_FILES libs/rekit/i18n/reboard_es.ts)
-    else()
-        message(WARNING "Qt LinguistTools not found: building without translations")
-    endif()
+    function(reboard_add_translations target)
+        if(NOT TARGET Qt6::lrelease)
+            message(WARNING "Qt LinguistTools not found: ${target} built without translations")
+            return()
+        endif()
+        set(qm_dir ${CMAKE_BINARY_DIR}/i18n/${target})
+        set(qm_file ${qm_dir}/reboard_es.qm)
+        add_custom_command(
+            OUTPUT ${qm_file}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${qm_dir}
+            COMMAND Qt6::lrelease ${CMAKE_SOURCE_DIR}/libs/rekit/i18n/reboard_es.ts -qm ${qm_file}
+            DEPENDS ${CMAKE_SOURCE_DIR}/libs/rekit/i18n/reboard_es.ts
+            VERBATIM)
+        qt6_add_resources(${target} "${target}_translations"
+            PREFIX "/i18n" BASE ${qm_dir} FILES ${qm_file})
+    endfunction()
+    reboard_add_translations(reboard-ui)
+    reboard_add_translations(reboard-settings)
+    reboard_add_translations(reboard-store)
 endif()
 
 if(REBOARD_BUILD_TESTS)

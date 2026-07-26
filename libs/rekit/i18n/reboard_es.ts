@@ -17,6 +17,21 @@
     </message>
 </context>
 <context>
+    <name>BuiltInApps</name>
+    <message>
+        <source>Notebooks</source>
+        <translation>Cuadernos</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Ajustes</translation>
+    </message>
+    <message>
+        <source>App Store</source>
+        <translation>App Store</translation>
+    </message>
+</context>
+<context>
     <name>ConfirmDialog</name>
     <message>
         <source>Cancel</source>
@@ -83,6 +98,10 @@
     <message>
         <source>OK</source>
         <translation>Aceptar</translation>
+    </message>
+    <message>
+        <source>Waking up Wi-Fi…</source>
+        <translation>Despertando el Wi-Fi…</translation>
     </message>
 </context>
 <context>

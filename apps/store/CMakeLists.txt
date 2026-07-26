@@ -15,7 +15,7 @@ add_executable(reboard-store
 set_target_properties(reboard-store PROPERTIES AUTOMOC ON)
 target_compile_options(reboard-store PRIVATE -Wall -Wextra)
 target_compile_definitions(reboard-store PRIVATE REBOARD_VERSION="${PROJECT_VERSION}")
-target_link_libraries(reboard-store PRIVATE reboard_core
+target_link_libraries(reboard-store PRIVATE reboard_core rekit_qt
     Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick Qt6::Network)
 
 install(TARGETS reboard-store RUNTIME DESTINATION bin)

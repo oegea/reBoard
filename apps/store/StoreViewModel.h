@@ -16,6 +16,7 @@ namespace reboard::store {
 class StoreViewModel : public QObject {
     Q_OBJECT
     Q_PROPERTY(bool loading READ loading NOTIFY stateChanged)
+    Q_PROPERTY(bool retrying READ retrying NOTIFY stateChanged)
     Q_PROPERTY(bool offline READ offline NOTIFY stateChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY stateChanged)
     Q_PROPERTY(QVariantList sections READ sections NOTIFY stateChanged)
@@ -28,6 +29,7 @@ public:
     explicit StoreViewModel(application::UseCaseFactory& useCases, QObject* parent = nullptr);
 
     bool loading() const { return loading_; }
+    bool retrying() const { return retrying_; }
     bool offline() const { return offline_; }
     QString errorMessage() const { return errorMessage_; }
     QVariantList sections() const { return sections_; }
@@ -50,6 +52,7 @@ signals:
     void detailChanged();
 
 private:
+    void fetchCatalog();
     void setDetailField(const QString& key, const QVariant& value);
     void finishDetail(const QVariantMap& record);
 
@@ -58,7 +61,9 @@ private:
     QString deviceSlug_;
 
     bool loading_ = false;
+    bool retrying_ = false;
     bool offline_ = false;
+    int catalogAttempt_ = 0;
     QString errorMessage_;
     QVariantList sections_;
     QVariantMap catalogPaths_;  // appId -> folder path within the repository.

@@ -17,6 +17,6 @@ target_compile_definitions(reboard-settings PRIVATE
     REBOARD_VERSION="${PROJECT_VERSION}"
     REBOARD_BUILD="${REBOARD_GIT_HASH}"
 )
-target_link_libraries(reboard-settings PRIVATE reboard_core Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick)
+target_link_libraries(reboard-settings PRIVATE reboard_core rekit_qt Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick)
 
 install(TARGETS reboard-settings RUNTIME DESTINATION bin)
