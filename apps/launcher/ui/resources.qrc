@@ -2,4 +2,8 @@
     <qresource prefix="/">
         <file>qml/Main.qml</file>
     </qresource>
+    <qresource prefix="/icons">
+        <file alias="notebooks.png">icons/notebooks.png</file>
+        <file alias="settings.png">icons/settings.png</file>
+    </qresource>
 </RCC>

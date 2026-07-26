@@ -14,6 +14,7 @@ class SettingsViewModel : public QObject {
     Q_PROPERTY(QString version READ version CONSTANT)
     Q_PROPERTY(QString build READ build CONSTANT)
     Q_PROPERTY(QString license READ license CONSTANT)
+    Q_PROPERTY(QString licenseText READ licenseText CONSTANT)
     Q_PROPERTY(QString storageFree READ storageFree CONSTANT)
     Q_PROPERTY(QString storageTotal READ storageTotal CONSTANT)
     Q_PROPERTY(QVariantList applications READ applications CONSTANT)
@@ -25,6 +26,7 @@ public:
     QString version() const;
     QString build() const;
     QString license() const;
+    QString licenseText() const;
     QString storageFree() const { return storageFree_; }
     QString storageTotal() const { return storageTotal_; }
     QVariantList applications() const { return applications_; }

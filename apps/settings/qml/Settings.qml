@@ -25,6 +25,9 @@ Window {
             anchors.right: parent.right
         }
 
+        // Simple two-page navigation: the main list and the license viewer.
+        property bool showingLicense: false
+
         Text {
             id: screenTitle
             anchors.top: topBar.bottom
@@ -34,10 +37,46 @@ Window {
             font.pixelSize: 56
             font.bold: true
             color: "black"
-            text: qsTr("Settings")
+            text: content.showingLicense ? qsTr("License") : qsTr("Settings")
+        }
+
+        PushButton {
+            visible: content.showingLicense
+            anchors.verticalCenter: screenTitle.verticalCenter
+            anchors.right: parent.right
+            anchors.rightMargin: 60
+            width: 180
+            height: 72
+            label: qsTr("Back")
+            onClicked: content.showingLicense = false
         }
 
         Flickable {
+            visible: content.showingLicense
+            anchors.top: screenTitle.bottom
+            anchors.topMargin: 40
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.leftMargin: 60
+            anchors.rightMargin: 60
+            contentHeight: licenseBody.height + 80
+            clip: true
+            boundsBehavior: Flickable.StopAtBounds
+
+            Text {
+                id: licenseBody
+                width: parent.width
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                font.pixelSize: 24
+                font.family: "monospace"
+                color: "black"
+                text: settingsVm.licenseText
+            }
+        }
+
+        Flickable {
+            visible: !content.showingLicense
             anchors.top: screenTitle.bottom
             anchors.topMargin: 40
             anchors.left: parent.left
@@ -59,7 +98,12 @@ Window {
                     width: parent.width
                     ListRow { label: qsTr("Version"); value: settingsVm.version }
                     ListRow { label: qsTr("Build"); value: settingsVm.build }
-                    ListRow { label: qsTr("License"); value: settingsVm.license; showDivider: false }
+                    ListRow {
+                        label: qsTr("License")
+                        value: settingsVm.license
+                        showDivider: false
+                        onClicked: content.showingLicense = true
+                    }
                 }
 
                 ListGroup {

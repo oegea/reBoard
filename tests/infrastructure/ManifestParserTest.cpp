@@ -66,6 +66,18 @@ TEST(ManifestParserTest, RejectsInvalidDockValues) {
     EXPECT_FALSE(parser.parse("app", "name=App\nexec=/bin/app\ndock=maybe\n", &error));
 }
 
+TEST(ManifestParserTest, ParsesHintFlag) {
+    const ManifestParser parser;
+    const auto withHint = parser.parse("app", "name=App\nexec=/bin/app\nhint=true\n");
+    ASSERT_TRUE(withHint);
+    EXPECT_TRUE(withHint->showReturnHint());
+    const auto withoutHint = parser.parse("app", "name=App\nexec=/bin/app\n");
+    ASSERT_TRUE(withoutHint);
+    EXPECT_FALSE(withoutHint->showReturnHint());
+    std::string error;
+    EXPECT_FALSE(parser.parse("app", "name=App\nexec=/bin/app\nhint=maybe\n", &error));
+}
+
 TEST(ManifestParserTest, AcceptsNumericDockValues) {
     const ManifestParser parser;
     const auto pinned = parser.parse("app", "name=App\nexec=/bin/app\ndock=1\n");

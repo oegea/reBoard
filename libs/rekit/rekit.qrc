@@ -5,6 +5,7 @@
         <file>components/HomeMarker.qml</file>
         <file>components/PushButton.qml</file>
         <file>components/HintDialog.qml</file>
+        <file>components/CheckMark.qml</file>
         <file>components/ListGroup.qml</file>
         <file>components/ListRow.qml</file>
     </qresource>

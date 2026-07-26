@@ -3,6 +3,7 @@
 #include <sys/statvfs.h>
 
 #include <QDir>
+#include <QFile>
 #include <QLocale>
 #include <QSettings>
 #include <QVariantMap>
@@ -52,6 +53,14 @@ QString SettingsViewModel::version() const { return QStringLiteral(REBOARD_VERSI
 QString SettingsViewModel::build() const { return QStringLiteral(REBOARD_BUILD); }
 
 QString SettingsViewModel::license() const { return QStringLiteral("GPL-3.0-or-later"); }
+
+QString SettingsViewModel::licenseText() const {
+    QFile file(QStringLiteral(":/legal/LICENSE"));
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return QStringLiteral("GPL-3.0 license text unavailable in this build.");
+    }
+    return QString::fromUtf8(file.readAll());
+}
 
 QString SettingsViewModel::language() const {
     QSettings config(QSettings::IniFormat, QSettings::UserScope, "reboard", "reboard");

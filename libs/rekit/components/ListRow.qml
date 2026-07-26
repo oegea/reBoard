@@ -42,12 +42,9 @@ Item {
             text: row.value
         }
 
-        Text {
+        CheckMark {
             visible: row.checked
-            font.pixelSize: 30
-            font.bold: true
-            color: "black"
-            text: "✓"
+            anchors.verticalCenter: parent.verticalCenter
         }
     }
 

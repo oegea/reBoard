@@ -2,4 +2,7 @@
     <qresource prefix="/">
         <file>qml/Settings.qml</file>
     </qresource>
+    <qresource prefix="/legal">
+        <file alias="LICENSE">../../LICENSE</file>
+    </qresource>
 </RCC>

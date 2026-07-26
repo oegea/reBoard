@@ -61,7 +61,9 @@ Window {
                         AppIcon {
                             anchors.horizontalCenter: parent.horizontalCenter
                             appData: modelData
-                            onActivated: (app) => hintDialog.openFor(app)
+                            onActivated: (app) => app.showReturnHint
+                                ? hintDialog.openFor(app)
+                                : launcher.launch(app.appId)
                         }
                     }
                 }
@@ -115,7 +117,9 @@ Window {
                     model: board.dock
                     AppIcon {
                         appData: modelData
-                        onActivated: (app) => hintDialog.openFor(app)
+                        onActivated: (app) => app.showReturnHint
+                            ? hintDialog.openFor(app)
+                            : launcher.launch(app.appId)
                     }
                 }
             }

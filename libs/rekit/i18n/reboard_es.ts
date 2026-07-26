@@ -62,5 +62,9 @@
         <source>Applications</source>
         <translation>Aplicaciones</translation>
     </message>
+    <message>
+        <source>Back</source>
+        <translation>Atrás</translation>
+    </message>
 </context>
 </TS>

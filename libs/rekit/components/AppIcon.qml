@@ -28,10 +28,13 @@ Item {
 
         Image {
             anchors.fill: parent
-            anchors.margins: 8
-            source: iconRoot.hasIcon ? "file://" + iconRoot.appData.icon : ""
+            anchors.margins: 16
+            source: !iconRoot.hasIcon ? ""
+                  : iconRoot.appData.icon.startsWith("qrc:") ? iconRoot.appData.icon
+                  : "file://" + iconRoot.appData.icon
             visible: iconRoot.hasIcon
             fillMode: Image.PreserveAspectFit
+            smooth: true
         }
 
         Text {

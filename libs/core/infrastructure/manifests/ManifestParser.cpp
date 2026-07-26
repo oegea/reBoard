@@ -74,6 +74,18 @@ std::optional<domain::Application> ManifestParser::parse(const std::string& id,
         }
     }
 
+    bool hint = false;
+    if (const auto hintValue = values.find("hint"); hintValue != values.end()) {
+        if (hintValue->second == "true" || hintValue->second == "1") {
+            hint = true;
+        } else if (hintValue->second == "false" || hintValue->second == "0") {
+            hint = false;
+        } else {
+            setError(error, "Invalid 'hint' value (expected true/false): " + hintValue->second);
+            return std::nullopt;
+        }
+    }
+
     std::string iconPath;
     if (const auto icon = values.find("icon"); icon != values.end()) {
         iconPath = icon->second;
@@ -87,10 +99,11 @@ std::optional<domain::Application> ManifestParser::parse(const std::string& id,
                 return std::nullopt;
             }
             return domain::Application(domain::ApplicationId(id), domain::ApplicationName(name->second),
-                                       domain::LaunchTarget::process(*argv), iconPath, dock);
+                                       domain::LaunchTarget::process(*argv), iconPath, dock, hint);
         }
         return domain::Application(domain::ApplicationId(id), domain::ApplicationName(name->second),
-                                   domain::LaunchTarget::systemdUnit(values.at("unit")), iconPath, dock);
+                                   domain::LaunchTarget::systemdUnit(values.at("unit")), iconPath,
+                                   dock, hint);
     } catch (const std::exception& exception) {
         setError(error, exception.what());
         return std::nullopt;

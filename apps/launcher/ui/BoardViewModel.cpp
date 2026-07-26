@@ -12,6 +12,7 @@ QVariantMap toVariant(const domain::Application& application) {
     map.insert("appId", QString::fromStdString(application.id().value()));
     map.insert("name", QString::fromStdString(application.name().value()));
     map.insert("icon", QString::fromStdString(application.iconPath()));
+    map.insert("showReturnHint", application.showReturnHint());
     const QString name = QString::fromStdString(application.name().value());
     map.insert("initial", name.isEmpty() ? QString("?") : name.left(1).toUpper());
     return map;

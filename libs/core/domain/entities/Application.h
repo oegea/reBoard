@@ -13,18 +13,23 @@ namespace reboard::domain {
 class Application {
 public:
     Application(ApplicationId id, ApplicationName name, LaunchTarget launchTarget,
-                std::string iconPath = "", bool pinnedToDock = false)
+                std::string iconPath = "", bool pinnedToDock = false,
+                bool showReturnHint = false)
         : id_(std::move(id)),
           name_(std::move(name)),
           launchTarget_(std::move(launchTarget)),
           iconPath_(std::move(iconPath)),
-          pinnedToDock_(pinnedToDock) {}
+          pinnedToDock_(pinnedToDock),
+          showReturnHint_(showReturnHint) {}
 
     const ApplicationId& id() const noexcept { return id_; }
     const ApplicationName& name() const noexcept { return name_; }
     const LaunchTarget& launchTarget() const noexcept { return launchTarget_; }
     const std::string& iconPath() const noexcept { return iconPath_; }
     bool pinnedToDock() const noexcept { return pinnedToDock_; }
+    // Whether the launcher should explain the return gesture before opening
+    // (used for the stock UI, which fully takes over the device).
+    bool showReturnHint() const noexcept { return showReturnHint_; }
 
     // Entities compare by identity.
     bool operator==(const Application& other) const noexcept { return id_ == other.id_; }
@@ -36,6 +41,7 @@ private:
     LaunchTarget launchTarget_;
     std::string iconPath_;
     bool pinnedToDock_;
+    bool showReturnHint_;
 };
 
 }  // namespace reboard::domain
