@@ -53,20 +53,22 @@ Window {
             property string label: ""
             property bool active: false
             signal tapped()
+            readonly property bool highlighted: active || accessoryTapArea.pressed
             width: 96
             height: 56
             radius: 10
-            color: active ? "black" : "white"
+            color: highlighted ? "black" : "white"
             border.color: "black"
             border.width: 3
             Text {
                 anchors.centerIn: parent
                 font.pixelSize: 24
                 font.bold: true
-                color: accessory.active ? "white" : "black"
+                color: accessory.highlighted ? "white" : "black"
                 text: accessory.label
             }
             MouseArea {
+                id: accessoryTapArea
                 anchors.fill: parent
                 onClicked: accessory.tapped()
             }

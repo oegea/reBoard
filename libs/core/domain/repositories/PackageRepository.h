@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 
 #include "domain/valueobjects/ApplicationId.h"
@@ -14,13 +15,18 @@ public:
     virtual ~PackageRepository() = default;
 
     // Extracts the package archive and registers its manifest so the board
-    // picks the application up. Throws std::runtime_error on failure.
-    virtual void install(const ApplicationId& id, const std::string& packagePath) = 0;
+    // picks the application up. `version` is recorded so updates can be
+    // detected later. Throws std::runtime_error on failure.
+    virtual void install(const ApplicationId& id, const std::string& packagePath,
+                         const std::string& version) = 0;
 
     // Removes the store manifest and the application files.
     virtual void uninstall(const ApplicationId& id) = 0;
 
     virtual bool isInstalled(const ApplicationId& id) const = 0;
+
+    // Version recorded at install time; empty when not installed.
+    virtual std::optional<std::string> installedVersion(const ApplicationId& id) const = 0;
 };
 
 }  // namespace reboard::domain

@@ -87,9 +87,11 @@ TEST(FilePackageRepositoryTest, InstallsAndRegistersTheManifest) {
     infrastructure::FilePackageRepository repository(appsRoot, manifests);
     const domain::ApplicationId id("demo");
 
-    repository.install(id, package);
+    repository.install(id, package, "1.2.3");
 
     EXPECT_TRUE(repository.isInstalled(id));
+    ASSERT_TRUE(repository.installedVersion(id));
+    EXPECT_EQ(*repository.installedVersion(id), "1.2.3");
     EXPECT_TRUE(fs::exists(appsRoot + "/demo/run.sh"));
     const std::string manifest = readFile(manifests + "/demo.app");
     EXPECT_NE(manifest.find("exec=" + appsRoot + "/demo/run.sh"), std::string::npos);
@@ -103,11 +105,12 @@ TEST(FilePackageRepositoryTest, UninstallRemovesEverything) {
     const std::string manifests = workspace.path() + "/apps-store";
     infrastructure::FilePackageRepository repository(appsRoot, manifests);
     const domain::ApplicationId id("demo");
-    repository.install(id, package);
+    repository.install(id, package, "1.0.0");
 
     repository.uninstall(id);
 
     EXPECT_FALSE(repository.isInstalled(id));
+    EXPECT_FALSE(repository.installedVersion(id));
     EXPECT_FALSE(fs::exists(appsRoot + "/demo"));
     EXPECT_FALSE(fs::exists(manifests + "/demo.app"));
 }
@@ -122,7 +125,8 @@ TEST(FilePackageRepositoryTest, RejectsPackagesWithoutManifest) {
 
     infrastructure::FilePackageRepository repository(workspace.path() + "/apps",
                                                      workspace.path() + "/apps-store");
-    EXPECT_THROW(repository.install(domain::ApplicationId("bad"), package), std::runtime_error);
+    EXPECT_THROW(repository.install(domain::ApplicationId("bad"), package, "1.0.0"),
+                 std::runtime_error);
     EXPECT_FALSE(repository.isInstalled(domain::ApplicationId("bad")));
 }
 
@@ -133,6 +137,6 @@ TEST(FilePackageRepositoryTest, FailedExtractionThrows) {
 
     infrastructure::FilePackageRepository repository(workspace.path() + "/apps",
                                                      workspace.path() + "/apps-store");
-    EXPECT_THROW(repository.install(domain::ApplicationId("garbage"), notATarball),
+    EXPECT_THROW(repository.install(domain::ApplicationId("garbage"), notATarball, "1.0.0"),
                  std::runtime_error);
 }

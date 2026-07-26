@@ -64,6 +64,18 @@ Window {
                 color: "black"
                 text: storeVm.detail.name !== undefined ? storeVm.detail.name : ""
             }
+
+            // Hairline that anchors the header once content scrolls under
+            // it (iOS convention).
+            Rectangle {
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: 2
+                color: "black"
+                opacity: (storeVm.detailVisible ? detailFlick.contentY
+                                                : catalogFlick.contentY) > 4 ? 0.5 : 0
+            }
         }
 
         // ------------------------- Catalog page -------------------------
@@ -267,13 +279,30 @@ Window {
                         }
                     }
 
-                    PushButton {
+                    Row {
                         anchors.horizontalCenter: parent.horizontalCenter
-                        width: 320
-                        height: 90
+                        spacing: 32
                         visible: storeVm.detail.installed === true
-                        label: qsTr("Remove")
-                        onClicked: storeVm.removeInstalled()
+
+                        PushButton {
+                            width: 320
+                            height: 90
+                            visible: storeVm.detail.updateAvailable === true
+                            label: storeVm.busy ? qsTr("Updating…") : qsTr("Update")
+                            primary: !storeVm.busy
+                            onClicked: {
+                                if (!storeVm.busy) {
+                                    storeVm.install()
+                                }
+                            }
+                        }
+
+                        PushButton {
+                            width: 320
+                            height: 90
+                            label: qsTr("Remove")
+                            onClicked: storeVm.removeInstalled()
+                        }
                     }
 
                     Text {

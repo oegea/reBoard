@@ -48,7 +48,10 @@ Item {
         text: back.label
     }
 
+    opacity: backTapArea.pressed ? 0.4 : 1
+
     MouseArea {
+        id: backTapArea
         anchors.fill: parent
         anchors.margins: -12
         onClicked: back.clicked()

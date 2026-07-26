@@ -31,8 +31,13 @@ std::string FilePackageRepository::manifestPath(const domain::ApplicationId& id)
     return storeManifestDirectory_ + "/" + id.value() + ".app";
 }
 
+std::string FilePackageRepository::versionPath(const domain::ApplicationId& id) const {
+    return storeManifestDirectory_ + "/" + id.value() + ".version";
+}
+
 void FilePackageRepository::install(const domain::ApplicationId& id,
-                                    const std::string& packagePath) {
+                                    const std::string& packagePath,
+                                    const std::string& version) {
     const std::string destination = appDirectory(id);
 
     std::error_code errorCode;
@@ -60,12 +65,28 @@ void FilePackageRepository::install(const domain::ApplicationId& id,
         throw std::runtime_error("Cannot register the manifest for " + id.value());
     }
     registered << expandAppDirToken(content.str(), destination);
+    registered.close();
+
+    std::ofstream versionFile(versionPath(id));
+    versionFile << version;
 }
 
 void FilePackageRepository::uninstall(const domain::ApplicationId& id) {
     std::error_code errorCode;
     fs::remove(manifestPath(id), errorCode);
+    fs::remove(versionPath(id), errorCode);
     fs::remove_all(appDirectory(id), errorCode);
+}
+
+std::optional<std::string> FilePackageRepository::installedVersion(
+    const domain::ApplicationId& id) const {
+    std::ifstream versionFile(versionPath(id));
+    if (!versionFile) {
+        return std::nullopt;
+    }
+    std::string version;
+    std::getline(versionFile, version);
+    return version;
 }
 
 bool FilePackageRepository::isInstalled(const domain::ApplicationId& id) const {

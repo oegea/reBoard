@@ -103,6 +103,14 @@
         <source>Waking up Wi-Fi…</source>
         <translation>Despertando el Wi-Fi…</translation>
     </message>
+    <message>
+        <source>Update</source>
+        <translation>Actualizar</translation>
+    </message>
+    <message>
+        <source>Updating…</source>
+        <translation>Actualizando…</translation>
+    </message>
 </context>
 <context>
     <name>StoreViewModel</name>

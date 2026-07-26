@@ -17,6 +17,13 @@ Item {
     width: parent ? parent.width : 0
     height: sublabel !== "" ? 118 : 88
 
+    // Instant pressed feedback.
+    Rectangle {
+        anchors.fill: parent
+        color: "black"
+        opacity: rowTapArea.pressed ? 0.12 : 0
+    }
+
     Column {
         anchors.left: parent.left
         anchors.leftMargin: 28
@@ -77,6 +84,7 @@ Item {
     }
 
     MouseArea {
+        id: rowTapArea
         anchors.fill: parent
         onClicked: row.clicked()
     }

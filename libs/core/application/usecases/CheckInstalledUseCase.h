@@ -15,6 +15,10 @@ public:
         return packageRepository_.isInstalled(id);
     }
 
+    std::optional<std::string> installedVersion(const domain::ApplicationId& id) const {
+        return packageRepository_.installedVersion(id);
+    }
+
 private:
     const domain::PackageRepository& packageRepository_;
 };

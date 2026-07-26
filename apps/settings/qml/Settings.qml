@@ -65,6 +65,18 @@ Window {
                 color: "black"
                 text: qsTr("License")
             }
+
+            // Hairline that anchors the header once content scrolls under
+            // it (iOS convention); invisible at the top of the page.
+            Rectangle {
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: 2
+                color: "black"
+                opacity: (content.showingLicense ? licenseFlick.contentY
+                                                 : mainFlick.contentY) > 4 ? 0.5 : 0
+            }
         }
 
         Flickable {

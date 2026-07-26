@@ -194,8 +194,19 @@ void StoreViewModel::finishDetail(const QVariantMap& record) {
     detail_.insert("available", !downloadUrl.isEmpty());
     detail_.insert("downloadUrl", downloadUrl);
     try {
-        detail_.insert("installed", useCases_.checkInstalled().execute(
-                                        domain::ApplicationId(appId.toStdString())));
+        const domain::ApplicationId id(appId.toStdString());
+        const bool installed = useCases_.checkInstalled().execute(id);
+        detail_.insert("installed", installed);
+        if (installed) {
+            const auto installedVersion = useCases_.checkInstalled().installedVersion(id);
+            const QString current =
+                installedVersion ? QString::fromStdString(*installedVersion) : QString();
+            detail_.insert("installedVersion", current);
+            // An empty recorded version means a pre-versioning install:
+            // offer the update too.
+            detail_.insert("updateAvailable",
+                           current != record.value("version").toString());
+        }
     } catch (const std::exception&) {
         detail_.insert("installed", false);
     }
@@ -242,7 +253,10 @@ void StoreViewModel::install() {
 
         try {
             useCases_.installPackage().execute(domain::ApplicationId(appId.toStdString()),
-                                               packagePath.toStdString());
+                                               packagePath.toStdString(),
+                                               detail_.value("version").toString().toStdString());
+            setDetailField("installedVersion", detail_.value("version"));
+            setDetailField("updateAvailable", false);
             setDetailField("installed", true);
         } catch (const std::exception& exception) {
             setDetailField("error", QString::fromUtf8(exception.what()));

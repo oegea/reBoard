@@ -45,10 +45,12 @@ Rectangle {
         property bool active: false
         signal tapped()
 
+        readonly property bool highlighted: active || primary || capTapArea.pressed
+
         width: 118
         height: 92
         radius: 12
-        color: active || primary ? "black" : "white"
+        color: highlighted ? "black" : "white"
         border.color: "black"
         border.width: 3
 
@@ -56,11 +58,12 @@ Rectangle {
             anchors.centerIn: parent
             font.pixelSize: 34
             font.bold: true
-            color: cap.active || cap.primary ? "white" : "black"
+            color: cap.highlighted ? "white" : "black"
             text: cap.label
         }
 
         MouseArea {
+            id: capTapArea
             anchors.fill: parent
             onClicked: cap.tapped()
         }

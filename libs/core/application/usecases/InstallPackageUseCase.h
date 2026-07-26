@@ -13,8 +13,9 @@ public:
     explicit InstallPackageUseCase(domain::PackageRepository& packageRepository)
         : packageRepository_(packageRepository) {}
 
-    void execute(const domain::ApplicationId& id, const std::string& packagePath) {
-        packageRepository_.install(id, packagePath);
+    void execute(const domain::ApplicationId& id, const std::string& packagePath,
+                 const std::string& version) {
+        packageRepository_.install(id, packagePath, version);
     }
 
 private:

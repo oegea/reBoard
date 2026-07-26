@@ -67,7 +67,16 @@ Item {
         elide: Text.ElideRight
     }
 
+    // Instant pressed feedback over the icon tile.
+    Rectangle {
+        anchors.fill: iconBox
+        radius: iconBox.radius
+        color: "black"
+        opacity: iconTapArea.pressed ? 0.25 : 0
+    }
+
     MouseArea {
+        id: iconTapArea
         anchors.fill: parent
         onClicked: {
             if (iconRoot.appData !== null) {
