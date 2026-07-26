@@ -7,27 +7,42 @@ old-iOS-style lock screen — time, date and a "slide to unlock" control — so
 waking the device feels familiar and delightful, in reBoard's e-paper visual
 language.
 
-## Status: planned (not yet implemented)
+## Status: phase 1 shipped (2026-07-26); phase 2 pending research
 
-## Notes and open questions
+## Device findings (validated on the rM2)
 
-- The power button is an evdev key (`KEY_POWER`); the resident daemon can
-  observe it just like touch input. Without xochitl running, suspend is not
-  handled by anyone — the daemon will need to orchestrate it (systemd
-  suspend or the reMarkable power paths) before/after showing the lock
-  screen. This needs on-device research: what does pressing the button do
-  today while reBoard owns the session?
-- The lock screen belongs to the launcher binary (board), shown by the
-  daemon when waking; Settings stays a separate app (ADR-0003). Visuals come
-  from the shared UI kit: it will need a `SlideToUnlock` component.
-- Sleep behavior must match device expectations (e-paper keeps the last
-  frame; a sleep screen image may be desirable, like the stock UI's).
+- The power button is its own evdev device (`snvs-powerkey`, `event0`,
+  `KEY_POWER`), separate from touch (`event2`) and pen (`event1`).
+- reMarkable OS ships `HandlePowerKey=ignore` for systemd-logind: with
+  xochitl stopped, the button does nothing by default — reBoard can own it
+  safely, with no risk of surprise poweroffs.
+- Suspend states `freeze standby mem` exist, but xochitl performs extra
+  teardown (Wi-Fi, sleep splash) before suspending — replicating that
+  safely is phase 2.
 
-## Acceptance criteria (draft)
+## Phase 1 (shipped)
 
-- [ ] Pressing power while reBoard is in the foreground suspends the device
-      after showing the lock screen frame.
-- [ ] Pressing power again wakes into the lock screen; sliding unlocks back
-      to wherever the user was (board or running app untouched).
-- [ ] Slide control is a reusable UI kit component.
-- [ ] All literals translatable.
+- `EvdevPowerButton` (core infrastructure) + `PowerButtonMonitor` (launcher
+  UI thread): pressing power while the **board** is on screen shows the
+  lock screen.
+- `LockScreen` (launcher screen): big light-weight clock, localized date,
+  full-screen input block; unlocking returns exactly where you were.
+- `SlideToUnlock` (reKit component): recessed track, draggable knob with a
+  drawn chevron, snap-back on incomplete drags. Literal "slide to unlock"
+  translated via the standard catalogs.
+- Overridable device via `REBOARD_POWER_DEVICE`.
+
+## Phase 2 (pending)
+
+- [ ] Real suspend/wake: replicate xochitl's teardown (Wi-Fi, splash) or
+      find the sanctioned path; wake must land on the lock screen.
+- [ ] Power press while a third-party app owns the screen (daemon-side
+      handling; xochitl keeps handling its own sleep while it runs).
+- [ ] Auto-lock after inactivity, sleep screen image.
+
+## Acceptance criteria (phase 1)
+
+- [x] Pressing power with the board visible shows the lock screen.
+- [x] Sliding the knob to the end unlocks; partial drags snap back.
+- [x] Clock/date localized and refreshed while visible.
+- [x] Slide control is a reusable reKit component; literals translatable.

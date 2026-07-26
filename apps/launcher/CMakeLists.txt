@@ -19,6 +19,7 @@ if(REBOARD_BUILD_UI)
         ui/main.cpp
         ui/BoardViewModel.cpp
         ui/LauncherController.cpp
+        ui/PowerButtonMonitor.cpp
         ${LAUNCHER_RESOURCES}
         ${LAUNCHER_REKIT}
     )

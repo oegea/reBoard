@@ -17,6 +17,13 @@
     </message>
 </context>
 <context>
+    <name>SlideToUnlock</name>
+    <message>
+        <source>slide to unlock</source>
+        <translation>desliza para desbloquear</translation>
+    </message>
+</context>
+<context>
     <name>Settings</name>
     <message>
         <source>Settings</source>

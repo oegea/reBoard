@@ -4,6 +4,7 @@ add_library(reboard_core STATIC
     domain/entities/Board.cpp
     domain/services/GestureDetector.cpp
     infrastructure/input/EvdevKeyboardDetector.cpp
+    infrastructure/input/EvdevPowerButton.cpp
     infrastructure/input/EvdevTouchScreen.cpp
     infrastructure/manifests/ManifestParser.cpp
     infrastructure/processes/PosixProcessRepository.cpp

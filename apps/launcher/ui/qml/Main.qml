@@ -137,5 +137,21 @@ Window {
             anchors.fill: parent
             onConfirmed: (app) => launcher.launch(app.appId)
         }
+
+        // Lock screen (story 007, phase 1): power button while the board is
+        // on screen.
+        LockScreen {
+            id: lockScreen
+            anchors.fill: parent
+            visible: false
+            onUnlocked: visible = false
+        }
+
+        Connections {
+            target: powerMonitor
+            function onPowerButtonPressed() {
+                lockScreen.visible = true
+            }
+        }
     }
 }

@@ -12,6 +12,7 @@
 #include "application/UseCaseFactory.h"
 #include "BoardViewModel.h"
 #include "LauncherController.h"
+#include "PowerButtonMonitor.h"
 
 namespace {
 
@@ -63,15 +64,25 @@ int main(int argc, char* argv[]) {
         uiRotation = 0;
     }
 
+    // Lock screen trigger (story 007): the launcher owns the power button
+    // while the board is on screen (logind ignores it on this device).
+    reboard::ui::PowerButtonMonitor powerMonitor(
+        qEnvironmentVariable("REBOARD_POWER_DEVICE").toStdString());
+    powerMonitor.start();
+
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("board", &board);
     engine.rootContext()->setContextProperty("launcher", &launcher);
     engine.rootContext()->setContextProperty("uiRotation", uiRotation);
+    engine.rootContext()->setContextProperty("powerMonitor", &powerMonitor);
     engine.load(QUrl(QStringLiteral("qrc:/qml/Main.qml")));
     if (engine.rootObjects().isEmpty()) {
         qWarning() << "reboard-ui: failed to load the QML interface";
         return 1;
     }
 
-    return app.exec();
+    const int exitCode = app.exec();
+    powerMonitor.requestStop();
+    powerMonitor.wait(2000);
+    return exitCode;
 }
