@@ -17,8 +17,12 @@ commit it; copy the template below).
 ## Test loop (agreed workflow)
 
 1. Build: `make cross-rm2`.
-2. Deploy: `scp build-rm2/apps/launcher/reboard build-rm2/apps/launcher/reboard-ui build-rm2/apps/settings/reboard-settings root@10.11.99.1:/home/root/`.
-3. Launch **persistently, with no timer** — the tester tries it at their own
+2. **Stop reBoard before deploying** — scp onto a RUNNING binary fails with
+   "Text file busy" (possibly silently), leaving stale binaries deployed:
+   `kill $(pidof reboard) $(pidof reboard-ui) 2>/dev/null`.
+   After copying, verify with `md5sum` on both ends when in doubt.
+3. Deploy: `scp build-rm2/apps/launcher/reboard build-rm2/apps/launcher/reboard-ui build-rm2/apps/settings/reboard-settings root@10.11.99.1:/home/root/`.
+4. Launch **persistently, with no timer** — the tester tries it at their own
    pace and reports back:
 
    ```sh
@@ -31,8 +35,8 @@ commit it; copy the template below).
      /home/root/reboard >/home/root/reboard.log 2>&1 &
    ```
 
-4. When done: `kill $(pidof reboard) $(pidof reboard-ui) 2>/dev/null; systemctl start xochitl`.
-5. Logs: `/home/root/reboard.log` (grep -v 'bin file' to drop benign noise)
+5. When done: `kill $(pidof reboard) $(pidof reboard-ui) 2>/dev/null; systemctl start xochitl`.
+6. Logs: `/home/root/reboard.log` (grep -v 'bin file' to drop benign noise)
    and `journalctl -b [-1]` for system-level events.
 
 ## Device facts learned the hard way
