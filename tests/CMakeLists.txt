@@ -18,8 +18,9 @@ add_executable(reboard_tests
     infrastructure/PosixProcessRepositoryTest.cpp
     infrastructure/UiDirectiveTest.cpp
     infrastructure/RepositoriesTest.cpp
+    terminal/TerminalEmulatorTest.cpp
 )
-target_link_libraries(reboard_tests PRIVATE reboard_core GTest::gtest_main)
+target_link_libraries(reboard_tests PRIVATE reboard_core terminal_emulator GTest::gtest_main)
 
 include(GoogleTest)
 gtest_discover_tests(reboard_tests)

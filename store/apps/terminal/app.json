@@ -1,0 +1,14 @@
+{
+    "id": "terminal",
+    "name": "Terminal",
+    "category": "development",
+    "version": "0.1.0",
+    "description": "A real terminal for your reMarkable: a bash login shell on a crisp monospace grid tuned for e-paper. Includes an on-screen keyboard, esc/tab/ctrl/arrow accessory keys, bold and inverse rendering, scroll regions and the alternate screen used by full-screen tools. Works great with the Type Folio keyboard. Return to the board anytime with the home gesture.",
+    "icon": "icon.png",
+    "screenshots": [],
+    "downloads": {
+        "rm1": "https://github.com/oegea/reBoard/releases/download/latest/reboard-terminal-rm1.tar.gz",
+        "rm2": "https://github.com/oegea/reBoard/releases/download/latest/reboard-terminal-rm2.tar.gz",
+        "ferrari": "https://github.com/oegea/reBoard/releases/download/latest/reboard-terminal-ferrari.tar.gz"
+    }
+}

@@ -9,6 +9,13 @@
     ],
     "apps": [
         {
+            "id": "terminal",
+            "name": "Terminal",
+            "category": "development",
+            "summary": "A real bash shell on your paper tablet",
+            "path": "apps/terminal"
+        },
+        {
             "id": "hello-demo",
             "name": "Hello Demo",
             "category": "development",
