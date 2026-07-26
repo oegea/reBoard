@@ -50,11 +50,50 @@ jobs:
       - name: Cross-compile reBoard
         run: make cross-${{ matrix.device }}
 
+      - name: Stage the distribution files
+        run: |
+          mkdir -p dist/reboard-${{ matrix.device }}
+          cp build-${{ matrix.device }}/src/reboard dist/reboard-${{ matrix.device }}/
+          cp -r packaging dist/reboard-${{ matrix.device }}/
+
       - name: Upload the device binary as an artifact
         uses: actions/upload-artifact@v4
         with:
           name: reboard-${{ matrix.device }}
-          path: |
-            build-${{ matrix.device }}/src/reboard
-            packaging/
+          path: dist/reboard-${{ matrix.device }}
           if-no-files-found: error
+
+  release:
+    name: Publish the rolling release
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Download all device artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Package the release assets
+        run: |
+          cd dist
+          for directory in reboard-*; do
+            zip -r "${directory}.zip" "${directory}"
+          done
+
+      # A single rolling "latest" release always points at the newest main
+      # build. Delete and recreate it so the tag follows the current commit.
+      - name: Update the "latest" release
+        run: |
+          gh release delete latest --repo "$GITHUB_REPOSITORY" --yes || true
+          gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/tags/latest" || true
+          gh release create latest dist/reboard-*.zip \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "Latest build (main)" \
+            --notes "Automated build of commit $GITHUB_SHA. One zip per device: rm1 = reMarkable 1, rm2 = reMarkable 2, ferrari = reMarkable Paper Pro. Each zip contains the launcher binary plus the systemd unit and an example application manifest."
