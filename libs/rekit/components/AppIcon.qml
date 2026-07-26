@@ -26,6 +26,9 @@ Item {
         width: 140
         height: 140
         radius: 28
+        // Top inset leaves room for the removal badge, which must stay
+        // inside this item's bounds or sibling delegates/clipping cut it.
+        y: 24
         anchors.horizontalCenter: parent.horizontalCenter
         color: "white"
         border.color: "black"
@@ -79,14 +82,15 @@ Item {
     }
 
     // Removal badge (drawn X), on top of everything including the tap area.
+    // Overlaps the icon corner but never leaves this item's bounds.
     Rectangle {
         visible: iconRoot.showRemoveBadge
         width: 56
         height: 56
         radius: 28
         color: "black"
-        anchors.horizontalCenter: iconBox.left
-        anchors.verticalCenter: iconBox.top
+        x: iconBox.x - 12
+        y: iconBox.y - 20
 
         Rectangle {
             anchors.centerIn: parent

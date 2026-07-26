@@ -16,6 +16,7 @@ namespace reboard::store {
 class StoreViewModel : public QObject {
     Q_OBJECT
     Q_PROPERTY(bool loading READ loading NOTIFY stateChanged)
+    Q_PROPERTY(bool offline READ offline NOTIFY stateChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY stateChanged)
     Q_PROPERTY(QVariantList sections READ sections NOTIFY stateChanged)
     Q_PROPERTY(bool detailVisible READ detailVisible NOTIFY detailChanged)
@@ -27,6 +28,7 @@ public:
     explicit StoreViewModel(application::UseCaseFactory& useCases, QObject* parent = nullptr);
 
     bool loading() const { return loading_; }
+    bool offline() const { return offline_; }
     QString errorMessage() const { return errorMessage_; }
     QVariantList sections() const { return sections_; }
     bool detailVisible() const { return detailVisible_; }
@@ -35,6 +37,9 @@ public:
     QString repositoryUrl() const;
 
     Q_INVOKABLE void reload();
+    // Leaves the store (the daemon shows the board again); used by the
+    // offline message.
+    Q_INVOKABLE void quitStore();
     Q_INVOKABLE void openApp(const QString& appId);
     Q_INVOKABLE void closeDetail();
     Q_INVOKABLE void install();
@@ -53,6 +58,7 @@ private:
     QString deviceSlug_;
 
     bool loading_ = false;
+    bool offline_ = false;
     QString errorMessage_;
     QVariantList sections_;
     QVariantMap catalogPaths_;  // appId -> folder path within the repository.

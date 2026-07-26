@@ -76,6 +76,14 @@
         <source>Not available for this device</source>
         <translation>No disponible para este dispositivo</translation>
     </message>
+    <message>
+        <source>No internet connection. Connect to a Wi-Fi network from the Notebooks app, then come back to the App Store.</source>
+        <translation>Sin conexión a internet. Conéctate a una red Wi-Fi desde la app de Notebooks y vuelve a la App Store.</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>Aceptar</translation>
+    </message>
 </context>
 <context>
     <name>StoreViewModel</name>

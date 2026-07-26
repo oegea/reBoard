@@ -76,8 +76,41 @@ Window {
             text: qsTr("Loading…")
         }
 
+        // Offline: guide the user to Wi-Fi (managed from the stock UI) and
+        // offer to leave the store, or retry (the radio may just be waking).
         Column {
-            visible: !storeVm.detailVisible && !storeVm.loading && storeVm.errorMessage !== ""
+            visible: !storeVm.detailVisible && !storeVm.loading &&
+                     storeVm.errorMessage !== "" && storeVm.offline
+            anchors.centerIn: parent
+            spacing: 40
+            width: parent.width - 240
+
+            Text {
+                width: parent.width
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.WordWrap
+                font.pixelSize: 32
+                color: "black"
+                text: qsTr("No internet connection. Connect to a Wi-Fi network from the Notebooks app, then come back to the App Store.")
+            }
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                spacing: 40
+                PushButton {
+                    label: qsTr("Retry")
+                    onClicked: storeVm.reload()
+                }
+                PushButton {
+                    label: qsTr("OK")
+                    primary: true
+                    onClicked: storeVm.quitStore()
+                }
+            }
+        }
+
+        Column {
+            visible: !storeVm.detailVisible && !storeVm.loading &&
+                     storeVm.errorMessage !== "" && !storeVm.offline
             anchors.centerIn: parent
             spacing: 40
             width: parent.width - 240

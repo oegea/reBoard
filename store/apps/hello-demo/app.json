@@ -3,7 +3,7 @@
     "name": "Hello Demo",
     "category": "development",
     "version": "1.0.0",
-    "description": "A tiny sample application used to validate the store install and uninstall flow end to end. It simply runs for twenty seconds and exits, returning you to the board. Safe to install and remove as many times as you like.",
+    "description": "A tiny sample application used to validate the store install and uninstall flow end to end. Heads up: it draws NOTHING on screen on purpose — when opened, the board image simply stays frozen for five seconds, then the launcher comes back automatically. Safe to install and remove as many times as you like.",
     "icon": "",
     "screenshots": [],
     "downloads": {

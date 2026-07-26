@@ -1,5 +1,6 @@
 #include "StoreViewModel.h"
 
+#include <QCoreApplication>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -17,12 +18,37 @@ constexpr const char* kDefaultRepository =
     "https://raw.githubusercontent.com/oegea/reBoard/main/store";
 }
 
+namespace {
+
+// Errors that mean "no usable connection" rather than a broken catalog.
+bool isConnectivityError(QNetworkReply::NetworkError error) {
+    switch (error) {
+        case QNetworkReply::ConnectionRefusedError:
+        case QNetworkReply::HostNotFoundError:
+        case QNetworkReply::TimeoutError:
+        case QNetworkReply::OperationCanceledError:  // Transfer timeout.
+        case QNetworkReply::TemporaryNetworkFailureError:
+        case QNetworkReply::NetworkSessionFailedError:
+        case QNetworkReply::UnknownNetworkError:
+            return true;
+        default:
+            return false;
+    }
+}
+
+}  // namespace
+
 StoreViewModel::StoreViewModel(application::UseCaseFactory& useCases, QObject* parent)
     : QObject(parent),
       useCases_(useCases),
       deviceSlug_(QString::fromStdString(infrastructure::currentDeviceSlug())) {
+    // Never hang on "Loading": a sleepy Wi-Fi radio must surface as an
+    // error state the user can act on.
+    network_.setTransferTimeout(15000);
     reload();
 }
+
+void StoreViewModel::quitStore() { QCoreApplication::quit(); }
 
 QString StoreViewModel::repositoryUrl() const {
     const QString envOverride = qEnvironmentVariable("REBOARD_STORE_URL");
@@ -35,6 +61,7 @@ QString StoreViewModel::repositoryUrl() const {
 
 void StoreViewModel::reload() {
     loading_ = true;
+    offline_ = false;
     errorMessage_.clear();
     emit stateChanged();
 
@@ -47,6 +74,7 @@ void StoreViewModel::reload() {
         catalogPaths_ = QVariantMap();
 
         if (reply->error() != QNetworkReply::NoError) {
+            offline_ = isConnectivityError(reply->error());
             errorMessage_ = reply->errorString();
             emit stateChanged();
             return;
