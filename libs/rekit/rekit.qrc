@@ -6,7 +6,9 @@
         <file>components/PushButton.qml</file>
         <file>components/SlideToUnlock.qml</file>
         <file>components/HintDialog.qml</file>
+        <file>components/BackButton.qml</file>
         <file>components/CheckMark.qml</file>
+        <file>components/ScrollIndicator.qml</file>
         <file>components/ListGroup.qml</file>
         <file>components/ListRow.qml</file>
     </qresource>

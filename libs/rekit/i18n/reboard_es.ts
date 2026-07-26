@@ -17,6 +17,13 @@
     </message>
 </context>
 <context>
+    <name>BackButton</name>
+    <message>
+        <source>Back</source>
+        <translation>Atrás</translation>
+    </message>
+</context>
+<context>
     <name>SlideToUnlock</name>
     <message>
         <source>slide to unlock</source>

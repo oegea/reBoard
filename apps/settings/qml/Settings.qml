@@ -28,32 +28,49 @@ Window {
         // Simple two-page navigation: the main list and the license viewer.
         property bool showingLicense: false
 
-        Text {
-            id: screenTitle
+        // Header: iOS large title on the main page; nav-bar style (back at
+        // the left, centered title) inside the license page.
+        Item {
+            id: header
             anchors.top: topBar.bottom
             anchors.topMargin: 40
             anchors.left: parent.left
-            anchors.leftMargin: 60
-            font.pixelSize: 56
-            font.bold: true
-            color: "black"
-            text: content.showingLicense ? qsTr("License") : qsTr("Settings")
-        }
-
-        PushButton {
-            visible: content.showingLicense
-            anchors.verticalCenter: screenTitle.verticalCenter
             anchors.right: parent.right
-            anchors.rightMargin: 60
-            width: 180
-            height: 72
-            label: qsTr("Back")
-            onClicked: content.showingLicense = false
+            height: 80
+
+            Text {
+                visible: !content.showingLicense
+                anchors.left: parent.left
+                anchors.leftMargin: 60
+                anchors.verticalCenter: parent.verticalCenter
+                font.pixelSize: 56
+                font.bold: true
+                color: "black"
+                text: qsTr("Settings")
+            }
+
+            BackButton {
+                visible: content.showingLicense
+                anchors.left: parent.left
+                anchors.leftMargin: 48
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: content.showingLicense = false
+            }
+
+            Text {
+                visible: content.showingLicense
+                anchors.centerIn: parent
+                font.pixelSize: 44
+                font.bold: true
+                color: "black"
+                text: qsTr("License")
+            }
         }
 
         Flickable {
+            id: licenseFlick
             visible: content.showingLicense
-            anchors.top: screenTitle.bottom
+            anchors.top: header.bottom
             anchors.topMargin: 40
             anchors.left: parent.left
             anchors.right: parent.right
@@ -75,9 +92,20 @@ Window {
             }
         }
 
+        ScrollIndicator {
+            target: licenseFlick
+            visible: licenseFlick.visible &&
+                     licenseFlick.contentHeight > licenseFlick.height
+            anchors.top: licenseFlick.top
+            anchors.bottom: licenseFlick.bottom
+            anchors.right: parent.right
+            anchors.rightMargin: 20
+        }
+
         Flickable {
+            id: mainFlick
             visible: !content.showingLicense
-            anchors.top: screenTitle.bottom
+            anchors.top: header.bottom
             anchors.topMargin: 40
             anchors.left: parent.left
             anchors.right: parent.right
@@ -147,6 +175,15 @@ Window {
                     }
                 }
             }
+        }
+
+        ScrollIndicator {
+            target: mainFlick
+            visible: mainFlick.visible && mainFlick.contentHeight > mainFlick.height
+            anchors.top: mainFlick.top
+            anchors.bottom: mainFlick.bottom
+            anchors.right: parent.right
+            anchors.rightMargin: 20
         }
 
         HomeMarker {

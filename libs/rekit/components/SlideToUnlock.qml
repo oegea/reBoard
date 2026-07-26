@@ -40,7 +40,7 @@ Item {
         y: 8
         width: 170
         height: parent.height - 16
-        radius: 20
+        radius: height / 2
         color: "black"
 
         // Drawn ">" chevron (device fonts lack arrow glyphs).
