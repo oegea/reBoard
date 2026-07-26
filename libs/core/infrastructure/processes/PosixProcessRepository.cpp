@@ -78,11 +78,13 @@ void PosixProcessRepository::stop(const domain::ProcessHandle& handle) {
     waitForExit(handle.pid(), 1000);
 }
 
-bool PosixProcessRepository::waitForExit(int pid, int timeoutMs) {
+bool PosixProcessRepository::waitForExit(int pid, int timeoutMs) const {
     const int pollIntervalMs = 20;
     for (int elapsed = 0; elapsed <= timeoutMs; elapsed += pollIntervalMs) {
-        const pid_t waited = ::waitpid(pid, nullptr, WNOHANG);
+        int status = 0;
+        const pid_t waited = ::waitpid(pid, &status, WNOHANG);
         if (waited == pid) {
+            recordExitStatus(pid, status);
             return true;  // Reaped: it is gone.
         }
         if (waited < 0 && ::kill(pid, 0) != 0) {
@@ -104,6 +106,7 @@ bool PosixProcessRepository::isRunning(const domain::ProcessHandle& handle) cons
     int status = 0;
     const pid_t waited = ::waitpid(handle.pid(), &status, WNOHANG);
     if (waited == handle.pid()) {
+        recordExitStatus(handle.pid(), status);
         return false;  // Just reaped: it is no longer running.
     }
     if (waited == 0) {
@@ -111,6 +114,25 @@ bool PosixProcessRepository::isRunning(const domain::ProcessHandle& handle) cons
     }
     // Not our child (or already reaped): fall back to a liveness probe.
     return ::kill(handle.pid(), 0) == 0;
+}
+
+void PosixProcessRepository::recordExitStatus(int pid, int status) const {
+    exitStatuses_[pid] = status;
+}
+
+bool PosixProcessRepository::lastExitWasAbnormal(const domain::ProcessHandle& handle) const {
+    if (handle.type() != domain::ProcessHandleType::Pid) {
+        return false;
+    }
+    const auto entry = exitStatuses_.find(handle.pid());
+    if (entry == exitStatuses_.end()) {
+        return false;
+    }
+    const int status = entry->second;
+    if (WIFSIGNALED(status)) {
+        return true;
+    }
+    return WIFEXITED(status) && WEXITSTATUS(status) != 0;
 }
 
 int PosixProcessRepository::runSystemctl(const std::string& verb,

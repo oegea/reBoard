@@ -140,9 +140,18 @@ int main() {
     const auto shutdownRequested = [] { return gShutdownRequested != 0; };
 
     int orientationPollCountdown = 0;
+    std::string lastForegroundId;
+    std::string pendingCrashNotice;
     while (!shutdownRequested()) {
         try {
         const auto state = useCases.refreshForegroundState().execute();
+        if (state == reboard::application::ForegroundState::Crashed) {
+            // Runtime safety net: tell the user instead of silently
+            // reappearing (story: error tolerance).
+            std::cerr << "reboard: foreground application ended abnormally: "
+                      << lastForegroundId << std::endl;
+            pendingCrashNotice = lastForegroundId;
+        }
 
         // Re-evaluate orientation every ~2 s (keyboard attach/detach).
         if (--orientationPollCountdown <= 0) {
@@ -180,6 +189,12 @@ int main() {
         homeRequested.store(false);
         rotationDegrees.store(currentRotationDegrees());
         ::setenv("REBOARD_UI_ROTATION", std::to_string(rotationDegrees.load()).c_str(), 1);
+        if (pendingCrashNotice.empty()) {
+            ::unsetenv("REBOARD_CRASH_NOTICE");
+        } else {
+            ::setenv("REBOARD_CRASH_NOTICE", pendingCrashNotice.c_str(), 1);
+            pendingCrashNotice.clear();
+        }
         std::optional<std::string> directive;
         try {
             directive = ui.runUntilExit(shutdownRequested);
@@ -196,6 +211,8 @@ int main() {
                     reboard::domain::ApplicationId(*directive));
                 if (result != reboard::application::LaunchResult::Launched) {
                     std::cerr << "reboard: unknown application " << *directive << std::endl;
+                } else {
+                    lastForegroundId = *directive;
                 }
             } catch (const std::exception& exception) {
                 std::cerr << "reboard: failed to launch " << *directive << ": "

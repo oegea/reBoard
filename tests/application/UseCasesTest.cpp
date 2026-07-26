@@ -50,6 +50,17 @@ public:
         }
         return false;
     }
+
+    bool lastExitWasAbnormal(const domain::ProcessHandle& handle) const override {
+        for (const auto& crashed : abnormalHandles) {
+            if (crashed == handle) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    std::vector<domain::ProcessHandle> abnormalHandles;
 };
 
 class FakeSessionRepository : public domain::SessionRepository {
@@ -209,6 +220,18 @@ TEST(RefreshForegroundStateUseCaseTest, ReportsRunningForeground) {
 
     EXPECT_EQ(useCase.execute(), application::ForegroundState::Running);
     EXPECT_TRUE(session.current);
+}
+
+TEST(RefreshForegroundStateUseCaseTest, ReportsCrashWhenExitWasAbnormal) {
+    FakeProcessRepository processes;
+    const auto handle = domain::ProcessHandle::forPid(71);
+    processes.abnormalHandles = {handle};
+    FakeSessionRepository session;
+    session.current = domain::ForegroundApplication(domain::ApplicationId("app"), handle);
+    application::RefreshForegroundStateUseCase useCase(processes, session);
+
+    EXPECT_EQ(useCase.execute(), application::ForegroundState::Crashed);
+    EXPECT_FALSE(session.current);
 }
 
 TEST(RefreshForegroundStateUseCaseTest, ClearsSessionWhenForegroundExited) {

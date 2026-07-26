@@ -8,7 +8,8 @@ namespace reboard::application {
 enum class ForegroundState {
     None,     // Nothing is tracked as foreground.
     Running,  // The tracked foreground application is still alive.
-    Exited,   // The tracked foreground application died on its own.
+    Exited,   // The tracked foreground application ended cleanly on its own.
+    Crashed,  // The tracked foreground application ended abnormally.
 };
 
 // Reconciles the tracked foreground application with reality, so the launcher
@@ -27,8 +28,9 @@ public:
         if (processRepository_.isRunning(foreground->handle())) {
             return ForegroundState::Running;
         }
+        const bool abnormal = processRepository_.lastExitWasAbnormal(foreground->handle());
         sessionRepository_.clear();
-        return ForegroundState::Exited;
+        return abnormal ? ForegroundState::Crashed : ForegroundState::Exited;
     }
 
 private:

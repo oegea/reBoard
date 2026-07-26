@@ -186,6 +186,18 @@ Window {
             }
         }
 
+        // Runtime safety net: shown when the daemon reports that the last
+        // application ended abnormally.
+        AlertDialog {
+            id: crashAlert
+            anchors.fill: parent
+        }
+        Component.onCompleted: {
+            if (crashNoticeApp !== "") {
+                crashAlert.open(qsTr("The application \"%1\" ended unexpectedly.").arg(crashNoticeApp))
+            }
+        }
+
         // Lock screen (story 007, phase 1): power button while the board is
         // on screen.
         LockScreen {

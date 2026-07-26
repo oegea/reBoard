@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/rekit">
+        <file>components/AlertDialog.qml</file>
         <file>components/AppIcon.qml</file>
         <file>components/TopBar.qml</file>
         <file>components/HomeMarker.qml</file>

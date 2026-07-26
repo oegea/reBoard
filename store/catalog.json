@@ -14,13 +14,6 @@
             "category": "development",
             "summary": "A real bash shell on your paper tablet",
             "path": "apps/terminal"
-        },
-        {
-            "id": "hello-demo",
-            "name": "Hello Demo",
-            "category": "development",
-            "summary": "Sample app to try the store install flow",
-            "path": "apps/hello-demo"
         }
     ]
 }

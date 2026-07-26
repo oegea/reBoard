@@ -23,6 +23,14 @@ public:
     virtual void stop(const ProcessHandle& handle) = 0;
 
     virtual bool isRunning(const ProcessHandle& handle) const = 0;
+
+    // Whether the process behind the handle ended abnormally (crash or
+    // non-zero exit). Only meaningful after it stopped running; systemd
+    // units report false (the stock UI manages its own failures).
+    virtual bool lastExitWasAbnormal(const ProcessHandle& handle) const {
+        (void)handle;
+        return false;
+    }
 };
 
 }  // namespace reboard::domain

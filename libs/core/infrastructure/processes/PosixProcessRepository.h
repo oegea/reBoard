@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <string>
 
 #include "domain/repositories/ProcessRepository.h"
@@ -23,12 +24,15 @@ public:
     void stop(const domain::ProcessHandle& handle) override;
 
     bool isRunning(const domain::ProcessHandle& handle) const override;
+    bool lastExitWasAbnormal(const domain::ProcessHandle& handle) const override;
 
 private:
     int runSystemctl(const std::string& verb, const std::string& unitName) const;
-    static bool waitForExit(int pid, int timeoutMs);
+    bool waitForExit(int pid, int timeoutMs) const;
+    void recordExitStatus(int pid, int status) const;
 
     std::string systemctlPath_;
+    mutable std::map<int, int> exitStatuses_;
 };
 
 }  // namespace reboard::infrastructure

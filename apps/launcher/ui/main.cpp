@@ -65,6 +65,9 @@ int main(int argc, char* argv[]) {
     engine.rootContext()->setContextProperty("launcher", &launcher);
     engine.rootContext()->setContextProperty("uiRotation", uiRotation);
     engine.rootContext()->setContextProperty("powerMonitor", &powerMonitor);
+    // Set by the daemon when the previous foreground app ended abnormally.
+    engine.rootContext()->setContextProperty("crashNoticeApp",
+                                             qEnvironmentVariable("REBOARD_CRASH_NOTICE"));
     engine.load(QUrl(QStringLiteral("qrc:/qml/Main.qml")));
     if (engine.rootObjects().isEmpty()) {
         qWarning() << "reboard-ui: failed to load the QML interface";

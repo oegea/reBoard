@@ -52,6 +52,17 @@
         <source>Remove &quot;%1&quot;? Its files will be deleted from the device.</source>
         <translation>¿Eliminar «%1»? Sus archivos se borrarán del dispositivo.</translation>
     </message>
+    <message>
+        <source>The application &quot;%1&quot; ended unexpectedly.</source>
+        <translation>La aplicación «%1» ha sufrido un error inesperado.</translation>
+    </message>
+</context>
+<context>
+    <name>AlertDialog</name>
+    <message>
+        <source>OK</source>
+        <translation>Aceptar</translation>
+    </message>
 </context>
 <context>
     <name>Store</name>

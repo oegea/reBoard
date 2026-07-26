@@ -28,6 +28,17 @@ Where the speed difference against the stock UI comes from:
       effect that also read as jank).
 - [x] Store update flow no longer requires remove + install.
 
+## xochitl analysis (2026-07-26, on device)
+
+- xochitl embeds the EPFramebuffer classes directly (symbols:
+  `EPFramebufferSwtcon`, `EPFramebufferCarta1000`, and notably
+  `EPFramebuffer::GhostControlMode` — ghosting control EXISTS in the
+  internal API). The lock file is `/tmp/epframebuffer.lock`.
+- The public epaper Qt plugin exposes none of those knobs in its strings:
+  our apps get whatever defaults the plugin picks. Reaching GhostControlMode
+  would require deeper reverse engineering (symbol-level, linked-library
+  analysis) — future work behind a safety gate; never risk the reboot loop.
+
 ## Next levers (ordered)
 
 - [ ] Measure and log the real times: UI spawn, xochitl start, app launch.
