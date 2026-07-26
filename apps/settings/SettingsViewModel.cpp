@@ -58,12 +58,14 @@ QString SettingsViewModel::build() const { return QStringLiteral(REBOARD_BUILD);
 
 QString SettingsViewModel::license() const { return QStringLiteral("GPL-3.0-or-later"); }
 
-QString SettingsViewModel::licenseText() const {
+QStringList SettingsViewModel::licenseParagraphs() const {
     QFile file(QStringLiteral(":/legal/LICENSE"));
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        return QStringLiteral("GPL-3.0 license text unavailable in this build.");
+        return {QStringLiteral("GPL-3.0 license text unavailable in this build.")};
     }
-    return QString::fromUtf8(file.readAll());
+    // Paragraph-per-delegate keeps the license viewer lazy: one giant Text
+    // element made scrolling crawl on e-paper.
+    return QString::fromUtf8(file.readAll()).split(QStringLiteral("\n\n"));
 }
 
 QString SettingsViewModel::language() const {

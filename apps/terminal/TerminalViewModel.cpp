@@ -1,6 +1,7 @@
 #include "TerminalViewModel.h"
 
 #include <QChar>
+#include <QCoreApplication>
 
 #include "infrastructure/input/EvdevKeyboardDetector.h"
 
@@ -27,7 +28,12 @@ TerminalViewModel::TerminalViewModel(QObject* parent) : QObject(parent) {
     connect(&coalesceTimer_, &QTimer::timeout, this, &TerminalViewModel::refreshLines);
     connect(&pty_, &PtySession::outputReceived, this,
             [this](const QByteArray& bytes) { onOutput(bytes); });
-    connect(&pty_, &PtySession::finished, this, &TerminalViewModel::refreshLines);
+    connect(&pty_, &PtySession::finished, this, [this] {
+        refreshLines();
+        // The shell is gone: nothing useful remains here. Give the user a
+        // moment to read the final output, then return to the board.
+        QTimer::singleShot(1200, [] { QCoreApplication::quit(); });
+    });
 }
 
 bool TerminalViewModel::physicalKeyboardPresent() const {

@@ -197,7 +197,13 @@ int main() {
         }
         std::optional<std::string> directive;
         try {
+            const auto uiStart = std::chrono::steady_clock::now();
             directive = ui.runUntilExit(shutdownRequested);
+            std::cerr << "reboard: timing ui-session "
+                      << std::chrono::duration_cast<std::chrono::milliseconds>(
+                             std::chrono::steady_clock::now() - uiStart)
+                             .count()
+                      << " ms" << std::endl;
         } catch (const std::exception& exception) {
             std::cerr << "reboard: failed to run the launcher UI: " << exception.what()
                       << std::endl;
@@ -207,8 +213,14 @@ int main() {
         }
         if (directive) {
             try {
+                const auto launchStart = std::chrono::steady_clock::now();
                 const auto result = useCases.launchApplication().execute(
                     reboard::domain::ApplicationId(*directive));
+                std::cerr << "reboard: timing launch(" << *directive << ") "
+                          << std::chrono::duration_cast<std::chrono::milliseconds>(
+                                 std::chrono::steady_clock::now() - launchStart)
+                                 .count()
+                          << " ms" << std::endl;
                 if (result != reboard::application::LaunchResult::Launched) {
                     std::cerr << "reboard: unknown application " << *directive << std::endl;
                 } else {

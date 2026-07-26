@@ -79,7 +79,9 @@ Window {
             }
         }
 
-        Flickable {
+        // Lazy paragraph list: only visible chunks are laid out, which keeps
+        // scrolling the full GPL text responsive on e-paper.
+        ListView {
             id: licenseFlick
             visible: content.showingLicense
             anchors.top: header.bottom
@@ -89,18 +91,18 @@ Window {
             anchors.bottom: parent.bottom
             anchors.leftMargin: 60
             anchors.rightMargin: 60
-            contentHeight: licenseBody.height + 80
             clip: true
             boundsBehavior: Flickable.StopAtBounds
+            spacing: 24
+            model: settingsVm.licenseParagraphs
 
-            Text {
-                id: licenseBody
-                width: parent.width
+            delegate: Text {
+                width: ListView.view.width
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 font.pixelSize: 24
                 font.family: "monospace"
                 color: "black"
-                text: settingsVm.licenseText
+                text: modelData
             }
         }
 
