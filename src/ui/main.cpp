@@ -35,9 +35,18 @@ int main(int argc, char* argv[]) {
     reboard::ui::BoardViewModel board(useCases);
     reboard::ui::LauncherController launcher;
 
+    // Content rotation (0, 90 or 270) decided by the daemon; see
+    // docs/stories/001-orientation-detection.md.
+    bool rotationParsed = false;
+    int uiRotation = qEnvironmentVariableIntValue("REBOARD_UI_ROTATION", &rotationParsed);
+    if (!rotationParsed || (uiRotation != 90 && uiRotation != 270)) {
+        uiRotation = 0;
+    }
+
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("board", &board);
     engine.rootContext()->setContextProperty("launcher", &launcher);
+    engine.rootContext()->setContextProperty("uiRotation", uiRotation);
     engine.load(QUrl(QStringLiteral("qrc:/qml/Main.qml")));
     if (engine.rootObjects().isEmpty()) {
         qWarning() << "reboard-ui: failed to load the QML interface";

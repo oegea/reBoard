@@ -18,6 +18,9 @@
 
 #include "application/UseCaseFactory.h"
 #include "domain/services/GestureDetector.h"
+#include "domain/services/OrientationPolicy.h"
+#include "domain/services/TouchCoordinateTransform.h"
+#include "infrastructure/input/EvdevKeyboardDetector.h"
 #include "infrastructure/input/EvdevTouchScreen.h"
 #include "infrastructure/processes/UiProcessController.h"
 
@@ -60,6 +63,23 @@ std::string uiBinaryPath() {
     return "reboard-ui";
 }
 
+// Current content rotation (0, 90, 270). Depends on keyboard presence and
+// manual overrides; recomputed periodically so the gesture zone follows the
+// visual bottom even while another application is on screen.
+int currentRotationDegrees() {
+    std::optional<std::string> manualOverride;
+    if (const char* value = std::getenv("REBOARD_ORIENTATION"); value != nullptr) {
+        manualOverride = value;
+    }
+    int landscapeRotation = 90;
+    if (const char* value = std::getenv("REBOARD_LANDSCAPE_ROTATION"); value != nullptr) {
+        landscapeRotation = std::atoi(value);
+    }
+    const auto orientation = reboard::domain::OrientationPolicy::decide(
+        reboard::infrastructure::EvdevKeyboardDetector::keyboardPresent(), manualOverride);
+    return reboard::domain::OrientationPolicy::rotationDegrees(orientation, landscapeRotation);
+}
+
 }  // namespace
 
 int main() {
@@ -77,7 +97,8 @@ int main() {
     // the display, which is the whole point of the home gesture.
     std::atomic<bool> stopTouchThread{false};
     std::atomic<bool> homeRequested{false};
-    std::thread touchThread([&stopTouchThread, &homeRequested] {
+    std::atomic<int> rotationDegrees{currentRotationDegrees()};
+    std::thread touchThread([&stopTouchThread, &homeRequested, &rotationDegrees] {
         try {
             std::string devicePath;
             if (const char* override = std::getenv("REBOARD_TOUCH_DEVICE"); override != nullptr) {
@@ -95,8 +116,12 @@ int main() {
             reboard::infrastructure::EvdevTouchScreen touchScreen(devicePath, invertX, invertY);
             reboard::domain::GestureDetector detector;
             touchScreen.run(
-                [&detector, &homeRequested](const reboard::domain::TouchSample& sample) {
-                    if (detector.feed(sample)) {
+                [&detector, &homeRequested, &rotationDegrees](
+                    const reboard::domain::TouchSample& sample) {
+                    // Rotate into the logical (visual) coordinate system so
+                    // "bottom edge" always means the visual bottom.
+                    if (detector.feed(reboard::domain::rotateTouchSample(
+                            sample, rotationDegrees.load()))) {
                         homeRequested.store(true);
                     }
                 },
@@ -114,8 +139,15 @@ int main() {
     reboard::infrastructure::UiProcessController ui(uiBinaryPath());
     const auto shutdownRequested = [] { return gShutdownRequested != 0; };
 
+    int orientationPollCountdown = 0;
     while (!shutdownRequested()) {
         const auto state = useCases.refreshForegroundState().execute();
+
+        // Re-evaluate orientation every ~2 s (keyboard attach/detach).
+        if (--orientationPollCountdown <= 0) {
+            rotationDegrees.store(currentRotationDegrees());
+            orientationPollCountdown = 10;
+        }
 
         if (state == reboard::application::ForegroundState::Running) {
             if (homeRequested.exchange(false)) {
@@ -131,8 +163,22 @@ int main() {
             continue;
         }
 
+        // Safety invariant: never show the UI while a unit-based application
+        // (e.g. xochitl) is alive — two EPFramebuffer owners reboot the
+        // device. If something is running, adopt it instead.
+        try {
+            if (useCases.adoptRunningApplication().execute()) {
+                std::cerr << "reboard: adopted an already-running application" << std::endl;
+                continue;
+            }
+        } catch (const std::exception& exception) {
+            std::cerr << "reboard: adoption check failed: " << exception.what() << std::endl;
+        }
+
         // Nothing (left) on screen: show the launcher UI and wait for a choice.
         homeRequested.store(false);
+        rotationDegrees.store(currentRotationDegrees());
+        ::setenv("REBOARD_UI_ROTATION", std::to_string(rotationDegrees.load()).c_str(), 1);
         std::optional<std::string> directive;
         try {
             directive = ui.runUntilExit(shutdownRequested);
@@ -153,6 +199,10 @@ int main() {
             } catch (const std::exception& exception) {
                 std::cerr << "reboard: failed to launch " << *directive << ": "
                           << exception.what() << std::endl;
+                // Give a possibly half-started unit time to settle; the
+                // adoption check at the top of the loop then picks it up
+                // instead of racing it with a fresh UI.
+                std::this_thread::sleep_for(std::chrono::seconds(2));
             }
             homeRequested.store(false);  // Drop gestures made while the UI was up.
         } else {

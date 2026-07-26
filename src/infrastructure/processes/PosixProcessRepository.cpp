@@ -18,7 +18,14 @@ PosixProcessRepository::PosixProcessRepository(std::string systemctlPath)
 domain::ProcessHandle PosixProcessRepository::launch(const domain::LaunchTarget& target) {
     if (target.type() == domain::LaunchType::SystemdUnit) {
         if (runSystemctl("start", target.unitName()) != 0) {
-            throw std::runtime_error("systemctl start failed for unit " + target.unitName());
+            // A false negative here is dangerous: concluding "not running"
+            // while the unit is actually coming up makes the caller show the
+            // launcher again and collide on the e-paper display. Trust
+            // is-active before giving up.
+            ::usleep(500 * 1000);
+            if (runSystemctl("is-active", target.unitName()) != 0) {
+                throw std::runtime_error("systemctl start failed for unit " + target.unitName());
+            }
         }
         return domain::ProcessHandle::forUnit(target.unitName());
     }
@@ -114,8 +121,15 @@ int PosixProcessRepository::runSystemctl(const std::string& verb,
         ::_exit(127);
     }
 
+    // The daemon handles SIGTERM/SIGINT without SA_RESTART, so this wait can
+    // be interrupted; treating EINTR as a failure would report a bogus error
+    // for a systemctl call that actually succeeded.
     int status = 0;
-    if (::waitpid(pid, &status, 0) != pid) {
+    pid_t waited;
+    do {
+        waited = ::waitpid(pid, &status, 0);
+    } while (waited < 0 && errno == EINTR);
+    if (waited != pid) {
         return -1;
     }
     if (WIFEXITED(status)) {

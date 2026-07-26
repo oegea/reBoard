@@ -11,6 +11,7 @@ add_executable(reboard_tests
     domain/ValueObjectsTest.cpp
     domain/BoardTest.cpp
     domain/GestureDetectorTest.cpp
+    domain/OrientationTest.cpp
     application/UseCasesTest.cpp
     infrastructure/ManifestParserTest.cpp
     infrastructure/PosixProcessRepositoryTest.cpp
