@@ -1,0 +1,20 @@
+# Build directories
+build/
+build-*/
+cmake-build-*/
+
+# reMarkable SDK installations
+sdk/
+*.sh.downloaded
+
+# IDE / tooling
+.vscode/
+.idea/
+compile_commands.json
+.cache/
+
+# Coverage output
+*.gcda
+*.gcno
+coverage/
+coverage.xml

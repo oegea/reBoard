@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Unit tests (host)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install gcovr
+        run: pipx install gcovr
+
+      - name: Build and run the unit tests with coverage
+        run: |
+          cmake -S . -B build-coverage -DREBOARD_BUILD_UI=OFF -DREBOARD_BUILD_TESTS=ON -DREBOARD_COVERAGE=ON
+          cmake --build build-coverage -j"$(nproc)"
+          ctest --test-dir build-coverage --output-on-failure
+
+      - name: Coverage report
+        run: gcovr --root . --filter 'src/' --exclude 'tests/' --print-summary
+
+  build:
+    name: Build for ${{ matrix.device }}
+    needs: test
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        device: [rm1, rm2, ferrari]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache the official reMarkable SDK installer
+        uses: actions/cache@v4
+        with:
+          path: .sdk-cache
+          key: remarkable-sdk-installer-${{ matrix.device }}-3.27.0.97
+
+      - name: Download and install the official reMarkable SDK
+        run: make sdk-${{ matrix.device }}
+
+      - name: Cross-compile reBoard
+        run: make cross-${{ matrix.device }}
+
+      - name: Upload the device binary as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reboard-${{ matrix.device }}
+          path: |
+            build-${{ matrix.device }}/src/reboard
+            packaging/
+          if-no-files-found: error

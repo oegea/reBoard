@@ -1,0 +1,20 @@
+# systemd unit for running reBoard as the resident launcher on a reMarkable
+# paper tablet. Install it to /etc/systemd/system/reboard.service, then:
+#   systemctl daemon-reload && systemctl enable --now reboard
+[Unit]
+Description=reBoard application launcher for reMarkable paper tablets
+After=multi-user.target
+
+[Service]
+Type=simple
+# Take over the e-paper display from the stock UI before starting. reBoard
+# starts xochitl again when the user opens the "Notebooks" entry.
+ExecStartPre=-/bin/systemctl stop xochitl
+Environment=QT_QUICK_BACKEND=epaper
+Environment=QT_QPA_EVDEV_TOUCHSCREEN_PARAMETERS=rotate=180:invertx
+ExecStart=/home/root/reboard -platform epaper
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,23 @@
+#pragma once
+
+#include <vector>
+
+#include "domain/repositories/ApplicationRepository.h"
+
+namespace reboard::infrastructure {
+
+// Provides the minimal set of fixed applications that must always exist on
+// the board. The only built-in entry is "Notebooks", which returns to the
+// stock device UI (the xochitl systemd service). Nothing is embedded: the
+// entry merely points at an external systemd unit.
+class BuiltInApplicationRepository : public domain::ApplicationRepository {
+public:
+    std::vector<domain::Application> findAll() const override {
+        return {domain::Application(domain::ApplicationId("xochitl"),
+                                    domain::ApplicationName("Notebooks"),
+                                    domain::LaunchTarget::systemdUnit("xochitl"),
+                                    "", /*pinnedToDock=*/true)};
+    }
+};
+
+}  // namespace reboard::infrastructure
