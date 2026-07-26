@@ -20,6 +20,10 @@ e-paper.
   minimal refreshes (e.g. clock updates at most twice a minute), generous
   touch targets (rows ≥ 80px), rounded 12–28px radii.
 - Literals inside components use `qsTr()` (ADR-0004).
+- **On-screen keyboard convention**: tapping a typing surface summons the
+  reKit `OnScreenKeyboard`, unless a physical keyboard is attached (evdev
+  detection); the keyboard's own `hide` key dismisses it. No app-specific
+  toggle buttons.
 - Distribution today: apps embed `libs/rekit/rekit.qrc` and import
   `qrc:/rekit/components`. Goal (story 008): a proper versioned QML module
   (`import ReKit 1.0`) once host tooling is validated in the cross SDK, so

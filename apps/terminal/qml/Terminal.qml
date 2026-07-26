@@ -38,30 +38,6 @@ Window {
             }
 
             Rectangle {
-                anchors.right: parent.right
-                anchors.rightMargin: 24
-                anchors.verticalCenter: parent.verticalCenter
-                width: 150
-                height: 48
-                radius: 10
-                color: osk.visible ? "black" : "white"
-                border.color: "black"
-                border.width: 3
-
-                Text {
-                    anchors.centerIn: parent
-                    font.pixelSize: 26
-                    font.bold: true
-                    color: osk.visible ? "white" : "black"
-                    text: qsTr("keyboard")
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: osk.visible = !osk.visible
-                }
-            }
-
-            Rectangle {
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -153,14 +129,17 @@ Window {
                 event.accepted = true
             }
 
+            // Measure a long run and divide: a single-glyph advance misses
+            // the fractional accumulation the layout engine applies, which
+            // made the cursor drift right of the text.
             TextMetrics {
                 id: cellMetrics
                 font.family: "monospace"
                 font.pixelSize: 26
-                text: "M"
+                text: "M".repeat(50)
             }
 
-            readonly property real cellWidth: cellMetrics.advanceWidth
+            readonly property real cellWidth: cellMetrics.advanceWidth / 50
             readonly property real cellHeight: Math.ceil(cellMetrics.height)
             readonly property int gridColumns: Math.max(20, Math.floor(width / cellWidth))
             readonly property int gridRows: Math.max(5, Math.floor(height / cellHeight))
@@ -194,13 +173,14 @@ Window {
                 opacity: 0.45
             }
 
-            // Tapping the screen summons the keyboard (there is no other
-            // affordance when no physical keyboard is attached).
+            // System convention (ADR-0005): tapping a typing surface
+            // summons the on-screen keyboard, unless a physical keyboard is
+            // attached; the keyboard's own hide key dismisses it.
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
                     screenArea.forceActiveFocus()
-                    if (!osk.visible) {
+                    if (!osk.visible && !terminalVm.physicalKeyboardPresent()) {
                         osk.visible = true
                     }
                 }

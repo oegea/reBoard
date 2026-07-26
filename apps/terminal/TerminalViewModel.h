@@ -33,6 +33,9 @@ public:
     Q_INVOKABLE void startShell(int columns, int rows);
     Q_INVOKABLE void setGridSize(int columns, int rows);
 
+    // OSK summoning convention (ADR-0005): only when no hardware keyboard.
+    Q_INVOKABLE bool physicalKeyboardPresent() const;
+
     // Text typed via the on-screen keyboard or committed key events.
     Q_INVOKABLE void sendText(const QString& text);
     // Special keys: Qt key code + modifiers, mapped to control sequences.

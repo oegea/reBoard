@@ -26,7 +26,7 @@ if(REBOARD_BUILD_UI)
     target_compile_options(reboard-terminal PRIVATE -Wall -Wextra)
     target_compile_definitions(reboard-terminal PRIVATE REBOARD_VERSION="${PROJECT_VERSION}")
     # `util` provides forkpty.
-    target_link_libraries(reboard-terminal PRIVATE terminal_emulator rekit_qt util
+    target_link_libraries(reboard-terminal PRIVATE terminal_emulator reboard_core rekit_qt util
         Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick)
 
     install(TARGETS reboard-terminal RUNTIME DESTINATION bin)

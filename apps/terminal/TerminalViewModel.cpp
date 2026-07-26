@@ -2,6 +2,8 @@
 
 #include <QChar>
 
+#include "infrastructure/input/EvdevKeyboardDetector.h"
+
 namespace reboard::terminal {
 
 namespace {
@@ -26,6 +28,10 @@ TerminalViewModel::TerminalViewModel(QObject* parent) : QObject(parent) {
     connect(&pty_, &PtySession::outputReceived, this,
             [this](const QByteArray& bytes) { onOutput(bytes); });
     connect(&pty_, &PtySession::finished, this, &TerminalViewModel::refreshLines);
+}
+
+bool TerminalViewModel::physicalKeyboardPresent() const {
+    return reboard::infrastructure::EvdevKeyboardDetector::keyboardPresent();
 }
 
 int TerminalViewModel::cursorRow() const { return emulator_.cursorRow(); }
