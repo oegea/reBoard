@@ -63,18 +63,20 @@ jobs:
           path: dist/reboard-${{ matrix.device }}
           if-no-files-found: error
 
-      - name: Package the Terminal store app
+      - name: Package the store apps
         run: |
-          mkdir -p dist/terminal-pkg
-          cp build-${{ matrix.device }}/apps/terminal/reboard-terminal dist/terminal-pkg/
-          cp apps/terminal/package/manifest.app apps/terminal/package/icon.png dist/terminal-pkg/
-          tar -czf dist/reboard-terminal-${{ matrix.device }}.tar.gz -C dist/terminal-pkg manifest.app icon.png reboard-terminal
+          for app in terminal claude; do
+            mkdir -p "dist/${app}-pkg"
+            cp "build-${{ matrix.device }}/apps/${app}/reboard-${app}" "dist/${app}-pkg/"
+            cp "apps/${app}/package/manifest.app" "apps/${app}/package/icon.png" "dist/${app}-pkg/"
+            tar -czf "dist/reboard-${app}-${{ matrix.device }}.tar.gz" -C "dist/${app}-pkg" manifest.app icon.png "reboard-${app}"
+          done
 
-      - name: Upload the Terminal store package
+      - name: Upload the store packages
         uses: actions/upload-artifact@v4
         with:
-          name: terminal-pkg-${{ matrix.device }}
-          path: dist/reboard-terminal-${{ matrix.device }}.tar.gz
+          name: store-pkgs-${{ matrix.device }}
+          path: dist/reboard-*-${{ matrix.device }}.tar.gz
           if-no-files-found: error
 
   release:
@@ -105,7 +107,7 @@ jobs:
         run: |
           gh release delete latest --repo "$GITHUB_REPOSITORY" --yes || true
           gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/tags/latest" || true
-          gh release create latest dist/reboard-*.zip dist/terminal-pkg-*/reboard-terminal-*.tar.gz \
+          gh release create latest dist/reboard-*.zip dist/store-pkgs-*/reboard-*.tar.gz \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --prerelease \

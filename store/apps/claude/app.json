@@ -1,0 +1,14 @@
+{
+    "id": "claude",
+    "name": "Claude Code",
+    "category": "development",
+    "version": "0.1.0",
+    "description": "Companion for your remote Claude Code sessions: connect over SSH to a machine running Claude Code and work through its official structured interface — read the streamed transcript on calm e-paper, see tool actions, and send follow-up prompts with the Type Folio or the on-screen keyboard. Phase 1 requires a config file (~/.config/reboard/claude.conf with host= and directory=) and SSH key authentication to the remote host.",
+    "icon": "icon.png",
+    "screenshots": [],
+    "downloads": {
+        "rm1": "https://github.com/oegea/reBoard/releases/download/latest/reboard-claude-rm1.tar.gz",
+        "rm2": "https://github.com/oegea/reBoard/releases/download/latest/reboard-claude-rm2.tar.gz",
+        "ferrari": "https://github.com/oegea/reBoard/releases/download/latest/reboard-claude-ferrari.tar.gz"
+    }
+}

@@ -37,6 +37,7 @@ add_subdirectory(apps/launcher)
 add_subdirectory(apps/terminal)
 
 if(REBOARD_BUILD_UI)
+    add_subdirectory(apps/claude)
     add_subdirectory(apps/settings)
     add_subdirectory(apps/store)
 
@@ -65,6 +66,7 @@ if(REBOARD_BUILD_UI)
     reboard_add_translations(reboard-settings)
     reboard_add_translations(reboard-store)
     reboard_add_translations(reboard-terminal)
+    reboard_add_translations(reboard-claude)
 endif()
 
 if(REBOARD_BUILD_TESTS)

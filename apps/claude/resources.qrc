@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/Claude.qml</file>
+    </qresource>
+</RCC>

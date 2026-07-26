@@ -14,6 +14,13 @@
             "category": "development",
             "summary": "A real bash shell on your paper tablet",
             "path": "apps/terminal"
+        },
+        {
+            "id": "claude",
+            "name": "Claude Code",
+            "category": "development",
+            "summary": "Supervise remote Claude Code sessions",
+            "path": "apps/claude"
         }
     ]
 }
