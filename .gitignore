@@ -14,6 +14,10 @@ sdk/
 compile_commands.json
 .cache/
 
+# Local-only docs (may contain device credentials — never commit)
+*.local.md
+docs/DEVICE-TESTING.local.md
+
 # Coverage output
 *.gcda
 *.gcno

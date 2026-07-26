@@ -1,4 +1,4 @@
-#include "ui/LauncherController.h"
+#include "LauncherController.h"
 
 #include <iostream>
 

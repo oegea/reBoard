@@ -1,4 +1,4 @@
-#include "ui/BoardViewModel.h"
+#include "BoardViewModel.h"
 
 #include <QDebug>
 #include <QVariantMap>

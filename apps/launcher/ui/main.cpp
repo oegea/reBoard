@@ -6,11 +6,12 @@
 #include <QLocale>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QSettings>
 #include <QTranslator>
 
 #include "application/UseCaseFactory.h"
-#include "ui/BoardViewModel.h"
-#include "ui/LauncherController.h"
+#include "BoardViewModel.h"
+#include "LauncherController.h"
 
 namespace {
 
@@ -33,10 +34,19 @@ int main(int argc, char* argv[]) {
     QGuiApplication::setApplicationName("reboard-ui");
     QGuiApplication::setApplicationVersion(REBOARD_VERSION);
 
-    // Translations (story 004): system locale, overridable for testing.
+    // Translations (ADR-0004): env override > persisted choice > system.
     QTranslator translator;
+    QLocale locale = QLocale::system();
     const QString localeOverride = qEnvironmentVariable("REBOARD_LOCALE");
-    const QLocale locale = localeOverride.isEmpty() ? QLocale::system() : QLocale(localeOverride);
+    if (!localeOverride.isEmpty()) {
+        locale = QLocale(localeOverride);
+    } else {
+        QSettings config(QSettings::IniFormat, QSettings::UserScope, "reboard", "reboard");
+        const QString language = config.value("language", "system").toString();
+        if (language != QStringLiteral("system") && !language.isEmpty()) {
+            locale = QLocale(language);
+        }
+    }
     if (translator.load(locale, "reboard", "_", ":/i18n")) {
         QGuiApplication::installTranslator(&translator);
     }

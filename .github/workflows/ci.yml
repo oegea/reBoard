@@ -53,7 +53,7 @@ jobs:
       - name: Stage the distribution files
         run: |
           mkdir -p dist/reboard-${{ matrix.device }}
-          cp build-${{ matrix.device }}/src/reboard build-${{ matrix.device }}/src/reboard-ui dist/reboard-${{ matrix.device }}/
+          cp build-${{ matrix.device }}/apps/launcher/reboard build-${{ matrix.device }}/apps/launcher/reboard-ui build-${{ matrix.device }}/apps/settings/reboard-settings dist/reboard-${{ matrix.device }}/
           cp -r packaging dist/reboard-${{ matrix.device }}/
 
       - name: Upload the device binary as an artifact

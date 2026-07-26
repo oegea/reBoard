@@ -16,6 +16,10 @@ public:
         return {domain::Application(domain::ApplicationId("xochitl"),
                                     domain::ApplicationName("Notebooks"),
                                     domain::LaunchTarget::systemdUnit("xochitl"),
+                                    "", /*pinnedToDock=*/true),
+                domain::Application(domain::ApplicationId("settings"),
+                                    domain::ApplicationName("Settings"),
+                                    domain::LaunchTarget::process({"/home/root/reboard-settings"}),
                                     "", /*pinnedToDock=*/true)};
     }
 };

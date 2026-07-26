@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Window
-import "components"
+import "qrc:/rekit/components"
 
 Window {
     id: root

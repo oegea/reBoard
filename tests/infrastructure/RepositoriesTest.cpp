@@ -109,7 +109,7 @@ TEST(CompositeApplicationRepositoryTest, FirstSourceWinsOnDuplicateIds) {
     infrastructure::CompositeApplicationRepository composite({&userApps, &builtIns});
 
     const auto applications = composite.findAll();
-    ASSERT_EQ(applications.size(), 1u);
+    ASSERT_EQ(applications.size(), 2u);  // Custom xochitl + built-in settings.
     EXPECT_EQ(applications[0].name().value(), "My Custom Notebooks");
 }
 
@@ -118,17 +118,20 @@ TEST(CompositeApplicationRepositoryTest, ConcatenatesDistinctApplications) {
     infrastructure::BuiltInApplicationRepository builtIns;
     infrastructure::CompositeApplicationRepository composite({&userApps, &builtIns});
 
-    EXPECT_EQ(composite.findAll().size(), 2u);
+    EXPECT_EQ(composite.findAll().size(), 3u);
 }
 
-TEST(BuiltInApplicationRepositoryTest, ProvidesTheXochitlEntry) {
+TEST(BuiltInApplicationRepositoryTest, ProvidesTheSystemEntries) {
     infrastructure::BuiltInApplicationRepository repository;
     const auto applications = repository.findAll();
 
-    ASSERT_EQ(applications.size(), 1u);
+    ASSERT_EQ(applications.size(), 2u);
     EXPECT_EQ(applications[0].id().value(), "xochitl");
     EXPECT_EQ(applications[0].launchTarget().type(), domain::LaunchType::SystemdUnit);
     EXPECT_TRUE(applications[0].pinnedToDock());
+    EXPECT_EQ(applications[1].id().value(), "settings");
+    EXPECT_EQ(applications[1].launchTarget().type(), domain::LaunchType::Process);
+    EXPECT_TRUE(applications[1].pinnedToDock());
 }
 
 TEST(InMemorySessionRepositoryTest, TracksForegroundLifecycle) {

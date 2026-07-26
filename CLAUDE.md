@@ -26,16 +26,24 @@ make clean
 
 Run a single test: `./build/tests/reboard_tests --gtest_filter='BoardTest.*'`
 
-## Architecture rules (from PROJECT.md — do not violate)
+## Architecture rules (from PROJECT.md and docs/adr — do not violate)
 
-- `src/domain/` depends on **nothing**. Immutable value objects and entities
-  (throwing constructors validate invariants), the pure `GestureDetector`
-  service, and repository interfaces.
-- `src/infrastructure/` implements domain repository interfaces only.
-- `src/application/` use cases depend **only on domain**; the single
-  exception is `UseCaseFactory`, which wires infrastructure implementations.
-- `src/ui/` (Qt) calls use cases; no business logic in the UI.
-- Everything (code, comments, docs) is in English.
+Layout (ADR-0003): `libs/core` (domain/application/infrastructure, Qt-free,
+target `reboard_core`), `libs/rekit` (shared QML component kit + i18n),
+`apps/launcher` (binaries `reboard` daemon + `reboard-ui`), `apps/settings`
+(binary `reboard-settings`). Apps never include other apps' sources — shared
+code goes to `libs/`.
+
+- `domain` depends on **nothing**; immutable VOs/entities, pure services,
+  repository interfaces.
+- `infrastructure` implements domain repositories only.
+- `application` use cases depend only on domain; `UseCaseFactory` is the
+  single infra-wiring point.
+- UI layers are composition of rekit components; no business logic in QML.
+- Every user-facing literal via qsTr() with catalogs in libs/rekit/i18n
+  (ADR-0004). Everything in English.
+- Device testing workflow and credentials: docs/DEVICE-TESTING.md (+ the
+  gitignored .local.md). Never run tests with a timer; launch persistently.
 
 ## Key design decisions
 
