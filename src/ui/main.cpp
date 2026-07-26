@@ -3,8 +3,10 @@
 
 #include <QDebug>
 #include <QGuiApplication>
+#include <QLocale>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QTranslator>
 
 #include "application/UseCaseFactory.h"
 #include "ui/BoardViewModel.h"
@@ -30,6 +32,14 @@ int main(int argc, char* argv[]) {
     QGuiApplication app(argc, argv);
     QGuiApplication::setApplicationName("reboard-ui");
     QGuiApplication::setApplicationVersion(REBOARD_VERSION);
+
+    // Translations (story 004): system locale, overridable for testing.
+    QTranslator translator;
+    const QString localeOverride = qEnvironmentVariable("REBOARD_LOCALE");
+    const QLocale locale = localeOverride.isEmpty() ? QLocale::system() : QLocale(localeOverride);
+    if (translator.load(locale, "reboard", "_", ":/i18n")) {
+        QGuiApplication::installTranslator(&translator);
+    }
 
     reboard::application::UseCaseFactory useCases(manifestDirectories());
     reboard::ui::BoardViewModel board(useCases);

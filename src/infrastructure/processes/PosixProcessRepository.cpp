@@ -17,6 +17,11 @@ PosixProcessRepository::PosixProcessRepository(std::string systemctlPath)
 
 domain::ProcessHandle PosixProcessRepository::launch(const domain::LaunchTarget& target) {
     if (target.type() == domain::LaunchType::SystemdUnit) {
+        // Quick open/close cycles can exhaust the unit's systemd start rate
+        // limit; a refused start marks the unit as failed, and on reMarkable
+        // xochitl's OnFailure= handler then REBOOTS the device. Clearing the
+        // failure counter first makes relaunching always safe.
+        runSystemctl("reset-failed", target.unitName());
         if (runSystemctl("start", target.unitName()) != 0) {
             // A false negative here is dangerous: concluding "not running"
             // while the unit is actually coming up makes the caller show the

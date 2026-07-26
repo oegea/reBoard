@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Window
+import "components"
 
 Window {
     id: root
@@ -19,100 +20,11 @@ Window {
         anchors.centerIn: parent
         rotation: uiRotation
 
-        // One selectable application icon, shared by the grid and the dock.
-        // Note: appData must NOT be a required property. Delegates with
-        // required properties opt out of the legacy context injection, so
-        // `modelData` would no longer be resolvable when AppIcon is used as
-        // a delegate.
-        component AppIcon: Item {
-            id: iconRoot
-            property var appData: null
-            readonly property bool hasIcon: appData !== null && appData.icon !== ""
-            width: 200
-            height: 240
-
-            Rectangle {
-                id: iconBox
-                width: 140
-                height: 140
-                radius: 28
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: "white"
-                border.color: "black"
-                border.width: 3
-
-                Image {
-                    anchors.fill: parent
-                    anchors.margins: 8
-                    source: iconRoot.hasIcon ? "file://" + iconRoot.appData.icon : ""
-                    visible: iconRoot.hasIcon
-                    fillMode: Image.PreserveAspectFit
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    visible: !iconRoot.hasIcon
-                    text: iconRoot.appData !== null ? iconRoot.appData.initial : ""
-                    font.pixelSize: 64
-                    font.bold: true
-                    color: "black"
-                }
-            }
-
-            Text {
-                anchors.top: iconBox.bottom
-                anchors.topMargin: 12
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width - 12
-                text: iconRoot.appData !== null ? iconRoot.appData.name : ""
-                font.pixelSize: 28
-                color: "black"
-                horizontalAlignment: Text.AlignHCenter
-                elide: Text.ElideRight
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    if (iconRoot.appData !== null) {
-                        launcher.launch(iconRoot.appData.appId)
-                    }
-                }
-            }
-        }
-
-        // Thin iOS-inspired status bar; e-paper friendly (minute refresh).
-        Rectangle {
+        TopBar {
             id: topBar
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            height: 56
-            color: "white"
-
-            Text {
-                id: clockText
-                anchors.centerIn: parent
-                font.pixelSize: 30
-                font.bold: true
-                color: "black"
-                text: Qt.formatTime(new Date(), "hh:mm")
-            }
-
-            Timer {
-                interval: 30000
-                running: true
-                repeat: true
-                onTriggered: clockText.text = Qt.formatTime(new Date(), "hh:mm")
-            }
-
-            Rectangle {
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                height: 2
-                color: "black"
-            }
         }
 
         // Paginated application grid, springboard style.
@@ -149,6 +61,7 @@ Window {
                         AppIcon {
                             anchors.horizontalCenter: parent.horizontalCenter
                             appData: modelData
+                            onActivated: (app) => hintDialog.openFor(app)
                         }
                     }
                 }
@@ -202,22 +115,23 @@ Window {
                     model: board.dock
                     AppIcon {
                         appData: modelData
+                        onActivated: (app) => hintDialog.openFor(app)
                     }
                 }
             }
         }
 
-        // Subtle home marker: hints at the gesture zone (swipe up from the
-        // visual bottom edge / long press) used to come back to the board.
-        Rectangle {
+        HomeMarker {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 8
             anchors.horizontalCenter: parent.horizontalCenter
-            width: 220
-            height: 8
-            radius: 4
-            color: "black"
-            opacity: 0.4
+        }
+
+        // Pre-launch hint: how to come back to the launcher (story 004).
+        HintDialog {
+            id: hintDialog
+            anchors.fill: parent
+            onConfirmed: (app) => launcher.launch(app.appId)
         }
     }
 }

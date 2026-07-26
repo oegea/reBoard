@@ -28,6 +28,7 @@ install(TARGETS reboard RUNTIME DESTINATION bin)
 # so the display lock is always released before the next application starts.
 if(REBOARD_BUILD_UI)
     find_package(Qt6 REQUIRED COMPONENTS Core Gui Qml Quick)
+    find_package(Qt6 QUIET COMPONENTS LinguistTools)
 
     qt6_add_resources(REBOARD_RESOURCES ui/resources.qrc)
 
@@ -41,6 +42,15 @@ if(REBOARD_BUILD_UI)
     target_compile_options(reboard-ui PRIVATE -Wall -Wextra)
     target_compile_definitions(reboard-ui PRIVATE REBOARD_VERSION="${PROJECT_VERSION}")
     target_link_libraries(reboard-ui PRIVATE reboard_core Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick)
+
+    # Translation catalogs (story 004). Embedded under :/i18n. Skipped with a
+    # warning when the toolchain ships no lrelease; the UI then falls back to
+    # the English source strings.
+    if(TARGET Qt6::lrelease)
+        qt6_add_translations(reboard-ui TS_FILES ui/i18n/reboard_es.ts)
+    else()
+        message(WARNING "Qt LinguistTools not found: building without translations")
+    endif()
 
     install(TARGETS reboard-ui RUNTIME DESTINATION bin)
 endif()

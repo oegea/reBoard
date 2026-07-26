@@ -141,6 +141,7 @@ int main() {
 
     int orientationPollCountdown = 0;
     while (!shutdownRequested()) {
+        try {
         const auto state = useCases.refreshForegroundState().execute();
 
         // Re-evaluate orientation every ~2 s (keyboard attach/detach).
@@ -207,6 +208,15 @@ int main() {
             homeRequested.store(false);  // Drop gestures made while the UI was up.
         } else {
             // The UI exited without choosing anything (crash?): brief backoff.
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+        } catch (const std::exception& exception) {
+            // The daemon is the last line of defense: it must survive any
+            // failure, log it and keep the device usable.
+            std::cerr << "reboard: unexpected error: " << exception.what() << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        } catch (...) {
+            std::cerr << "reboard: unexpected unknown error" << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
     }
